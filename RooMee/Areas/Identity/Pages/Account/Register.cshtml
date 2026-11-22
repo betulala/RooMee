@@ -1,0 +1,69 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <h1 class="h3 mb-1">Hesap Oluştur</h1>
+        <p class="text-muted mb-4">RooMee'ye katıl, ev arkadaşını bul.</p>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Input.Ad" class="form-label"></label>
+                    <input asp-for="Input.Ad" class="form-control" autocomplete="given-name" />
+                    <span asp-validation-for="Input.Ad" class="text-danger"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="Input.Soyad" class="form-label"></label>
+                    <input asp-for="Input.Soyad" class="form-control" autocomplete="family-name" />
+                    <span asp-validation-for="Input.Soyad" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username"
+                       placeholder="ornek@mail.com" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Input.KvkkOnay" class="form-check-input" />
+                <label asp-for="Input.KvkkOnay" class="form-check-label">
+                    <a href="/Home/Privacy" target="_blank">KVKK aydınlatma metnini</a> okudum, kabul ediyorum.
+                </label>
+                <span asp-validation-for="Input.KvkkOnay" class="text-danger d-block"></span>
+            </div>
+
+            <p class="small text-muted">Kayıt sonrası e-postana doğrulama bağlantısı gönderilir. Öğrenciysen profilinden üniversite e-postanı doğrulayarak "Doğrulanmış öğrenci" rozeti alabilirsin.</p>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Kayıt Ol</button>
+
+            <p class="text-center mt-3">
+                Hesabın var mı? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Giriş yap</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

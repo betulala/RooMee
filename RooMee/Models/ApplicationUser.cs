@@ -13,6 +13,11 @@ public class ApplicationUser : IdentityUser
 
     public DateTime KvkkOnayTarihi { get; set; }
     public DateTime KayitTarihi { get; set; } = DateTime.UtcNow;
+    // Öğrenci doğrulama (profilden yapılır)
+    [StringLength(256)]
+    public string? OgrenciEposta { get; set; }
+    public bool OgrenciDogrulandi { get; set; }
+    public DateTime? OgrenciDogrulamaTarihi { get; set; }
 
     public Profil? Profil { get; set; }
     public List<Ilan> Ilanlar { get; set; } = new();

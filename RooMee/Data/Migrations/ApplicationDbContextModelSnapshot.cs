@@ -203,6 +203,16 @@ namespace RooMee.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateTime?>("OgrenciDogrulamaTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("OgrenciDogrulandi")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OgrenciEposta")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
