@@ -1,0 +1,54 @@
+﻿@model OgrenciDogrulamaViewModel
+@{
+    ViewData["Title"] = "Öğrenci Doğrulama";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <h1 class="h3 mb-1">Öğrenciliğini doğrula</h1>
+        <p class="text-muted mb-4">
+            Üniversite e-postana 6 haneli bir kod gönderelim. Doğrulama sonrası profilinde ve ilanlarında
+            "Doğrulanmış öğrenci" rozeti görünür.
+        </p>
+
+        @if (!Model.KodGonderildi)
+        {
+            <form asp-action="KodGonder" method="post">
+                <div class="mb-3">
+                    <label asp-for="OgrenciEposta" class="form-label"></label>
+                    <input asp-for="OgrenciEposta" class="form-control" placeholder="ad.soyad@ogr.selcuk.edu.tr" />
+                    <span asp-validation-for="OgrenciEposta" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Kod gönder</button>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <strong>@Model.OgrenciEposta</strong> adresine kod gönderdik. Gelen kutunu ve spam klasörünü kontrol et.
+            </div>
+
+            <form asp-action="KodDogrula" method="post">
+                <input type="hidden" asp-for="OgrenciEposta" />
+                <div class="mb-3">
+                    <label asp-for="Kod" class="form-label"></label>
+                    <input asp-for="Kod" class="form-control form-control-lg text-center" inputmode="numeric"
+                           maxlength="6" autocomplete="one-time-code" placeholder="______" />
+                    <span asp-validation-for="Kod" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Doğrula</button>
+            </form>
+
+            <form asp-action="KodGonder" method="post" class="mt-2 text-center">
+                <input type="hidden" asp-for="OgrenciEposta" />
+                <button type="submit" class="btn btn-link btn-sm">Kodu tekrar gönder</button>
+            </form>
+        }
+
+        <p class="text-center mt-3"><a asp-action="Goruntule">← Profile dön</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

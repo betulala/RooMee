@@ -7,7 +7,7 @@
     {
         var kullanici = await UserManager.GetUserAsync(User);
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index">Merhaba, @kullanici?.Ad</a>
+            <a class="nav-link text-dark" asp-area="" asp-controller="Profil" asp-action="Goruntule">Profilim (@kullanici?.Ad)</a>
         </li>
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"

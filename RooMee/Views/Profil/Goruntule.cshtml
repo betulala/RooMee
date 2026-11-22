@@ -1,0 +1,105 @@
+﻿@model ApplicationUser
+@{
+    ViewData["Title"] = Model.KisaAd;
+    var p = Model.Profil;
+    bool kendi = ViewBag.KendiProfili == true;
+}
+@functions {
+    string Butce(Profil p) => (p.ButceMin, p.ButceMax) switch
+    {
+        (null, null) => "Belirtilmemiş",
+        (int min, null) => $"{min:N0} TL ve üzeri",
+        (null, int max) => $"{max:N0} TL'ye kadar",
+        (int min, int max) => $"{min:N0} – {max:N0} TL"
+    };
+    string Saat(TimeOnly? s) => s?.ToString("HH:mm") ?? "–";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        @if (TempData["Mesaj"] is string mesaj)
+        {
+            <div class="alert alert-success">@mesaj</div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                @if (!string.IsNullOrEmpty(p?.FotoYolu))
+                {
+                    <img src="@p.FotoYolu" alt="Profil fotoğrafı" class="rounded-circle mb-3"
+                         style="width:120px;height:120px;object-fit:cover" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:120px;height:120px;font-size:44px">
+                        @Model.Ad.FirstOrDefault()
+                    </div>
+                }
+
+                <h1 class="h4 mb-1">@Model.KisaAd</h1>
+
+                @if (Model.OgrenciDogrulandi)
+                {
+                    <span class="badge bg-success mb-2">✓ Doğrulanmış öğrenci</span>
+                }
+                else if (kendi)
+                {
+                    <div><a asp-action="OgrenciDogrula" class="btn btn-sm btn-outline-success mb-2">Öğrenciliğini doğrula</a></div>
+                }
+
+                <p class="text-muted mb-0">
+                    @p?.Universite @(string.IsNullOrEmpty(p?.Bolum) ? "" : " · " + p.Bolum)
+                </p>
+
+                @if (p == null)
+                {
+                    <p class="mt-3">
+                        @if (kendi)
+                        {
+                            <span>Profilin henüz boş. <a asp-action="Duzenle">Şimdi doldur</a></span>
+                        }
+                        else
+                        {
+                            <span>Bu kullanıcı henüz profilini doldurmamış.</span>
+                        }
+                    </p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush text-start mt-3">
+                        <li class="list-group-item"><strong>Bütçe:</strong> @Butce(p)</li>
+                        <li class="list-group-item"><strong>Uyku düzeni:</strong> @Saat(p.YatisSaati) – @Saat(p.KalkisSaati)</li>
+                        <li class="list-group-item">
+                            <strong>Yaşam tarzı:</strong>
+                            <span class="badge rounded-pill text-bg-light border">@(p.SigaraIciyor ? "Sigara içiyor" : "Sigara içmiyor")</span>
+                            <span class="badge rounded-pill text-bg-light border">@(p.EvcilHayvanVar ? "Evcil hayvanı var" : "Evcil hayvanı yok")</span>
+                            @if (p.SessizOrtamIster)
+                            {
+                                <span class="badge rounded-pill text-bg-light border">Sessiz ortam ister</span>
+                            }
+                        </li>
+                        @if (!string.IsNullOrWhiteSpace(p.Hakkinda))
+                        {
+                            <li class="list-group-item">
+                                <strong>Hakkında</strong>
+                                <p class="mb-0" style="white-space:pre-line">@p.Hakkinda</p>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                <div class="mt-3">
+                    @if (kendi)
+                    {
+                        <a asp-action="Duzenle" class="btn btn-primary">Profili düzenle</a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" disabled title="Yakında">Mesaj gönder</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

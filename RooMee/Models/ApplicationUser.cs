@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
 namespace RooMee.Models;
@@ -18,6 +19,8 @@ public class ApplicationUser : IdentityUser
     public string? OgrenciEposta { get; set; }
     public bool OgrenciDogrulandi { get; set; }
     public DateTime? OgrenciDogrulamaTarihi { get; set; }
+    [NotMapped]
+    public string KisaAd => string.IsNullOrEmpty(Soyad) ? Ad : $"{Ad} {Soyad[0]}.";
 
     public Profil? Profil { get; set; }
     public List<Ilan> Ilanlar { get; set; } = new();
