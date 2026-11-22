@@ -1,0 +1,45 @@
+﻿@model HesapSilViewModel
+@{
+    ViewData["Title"] = "Hesabı Sil";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+        <h1 class="h3 text-danger mb-3">Hesabı sil</h1>
+
+        <div class="alert alert-warning">
+            <strong>Bu işlem geri alınamaz.</strong> Hesabınla birlikte şunlar kalıcı olarak silinir:
+            <ul class="mb-0 mt-2">
+                <li>Profil bilgilerin ve fotoğrafın</li>
+                <li>Öğrenci doğrulama bilgin</li>
+                <li>Tüm ilanların ve ilan fotoğrafların</li>
+                <li>Favorilerin ve şikayet kayıtların</li>
+            </ul>
+        </div>
+
+        <form asp-action="HesapSil" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Sifre" class="form-label"></label>
+                <input asp-for="Sifre" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Sifre" class="text-danger"></span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Onay" class="form-check-input" />
+                <label asp-for="Onay" class="form-check-label"></label>
+                <span asp-validation-for="Onay" class="text-danger d-block"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Hesabımı kalıcı olarak sil</button>
+                <a asp-action="Goruntule" class="btn btn-outline-secondary">Vazgeç</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

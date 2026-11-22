@@ -60,3 +60,12 @@ public class OgrenciDogrulamaViewModel
 
     public bool KodGonderildi { get; set; }
 }
+
+public class HesapSilViewModel
+{
+    [Required(ErrorMessage = "Şifreni gir."), DataType(DataType.Password), Display(Name = "Şifre")]
+    public string Sifre { get; set; } = "";
+
+    [Display(Name = "Hesabımın ve tüm verilerimin kalıcı olarak silineceğini anlıyorum.")]
+    public bool Onay { get; set; }
+}

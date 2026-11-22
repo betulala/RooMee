@@ -14,17 +14,20 @@ public class ProfilController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailSender _eposta;
     private readonly IWebHostEnvironment _env;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
     private static readonly string[] IzinliUzantilar = { ".jpg", ".jpeg", ".png", ".webp" };
     private const long MaxFotoBoyutu = 2 * 1024 * 1024; // 2 MB
 
     public ProfilController(ApplicationDbContext db, UserManager<ApplicationUser> userManager,
-                            IEmailSender eposta, IWebHostEnvironment env)
+                        IEmailSender eposta, IWebHostEnvironment env,
+                        SignInManager<ApplicationUser> signInManager)
     {
         _db = db;
         _userManager = userManager;
         _eposta = eposta;
         _env = env;
+        _signInManager = signInManager;
     }
 
     public IActionResult Index() => RedirectToAction(nameof(Goruntule));
@@ -200,6 +203,59 @@ public class ProfilController : Controller
 
         TempData["Mesaj"] = "Tebrikler! Öğrenciliğin doğrulandı.";
         return RedirectToAction(nameof(Goruntule));
+    }
+
+    // ---------- Hesabı silme ----------
+
+    [HttpGet]
+    public IActionResult HesapSil() => View(new HesapSilViewModel());
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HesapSil(HesapSilViewModel vm)
+    {
+        if (!vm.Onay)
+            ModelState.AddModelError(nameof(vm.Onay), "Devam etmek için kutuyu işaretlemelisin.");
+        if (!ModelState.IsValid) return View(vm);
+
+        var k = await MevcutKullanici();
+        if (!await _userManager.CheckPasswordAsync(k, vm.Sifre))
+        {
+            ModelState.AddModelError(nameof(vm.Sifre), "Şifre hatalı.");
+            return View(vm);
+        }
+
+        // Diskten silinecek fotoğrafları önceden topla
+        var dosyalar = await _db.IlanFotolari
+            .Where(f => f.Ilan!.KullaniciId == k.Id)
+            .Select(f => f.Yol)
+            .ToListAsync();
+        if (!string.IsNullOrEmpty(k.Profil?.FotoYolu))
+            dosyalar.Add(k.Profil.FotoYolu);
+
+        await using var islem = await _db.Database.BeginTransactionAsync();
+
+        // Zincirleme silinmeyen kayıtları elle sil
+        await _db.Favoriler.Where(f => f.KullaniciId == k.Id).ExecuteDeleteAsync();
+        await _db.Sikayetler
+            .Where(s => s.SikayetEdenId == k.Id || s.SikayetEdilenKullaniciId == k.Id)
+            .ExecuteDeleteAsync();
+
+        // Kullanıcıyı sil (profil, ilanlar ve ilan fotoğrafları kayıtları otomatik silinir)
+        var sonuc = await _userManager.DeleteAsync(k);
+        if (!sonuc.Succeeded)
+        {
+            await islem.RollbackAsync();
+            ModelState.AddModelError(string.Empty, "Hesap silinirken bir hata oluştu. Lütfen tekrar dene.");
+            return View(vm);
+        }
+        await islem.CommitAsync();
+
+        foreach (var yol in dosyalar)
+            EskiFotoyuSil(yol);
+
+        await _signInManager.SignOutAsync();
+        TempData["Mesaj"] = "Hesabın ve tüm verilerin kalıcı olarak silindi.";
+        return Redirect("/");
     }
 
     // ---------- Yardımcılar ----------
