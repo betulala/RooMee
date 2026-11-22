@@ -140,8 +140,8 @@ public class RegisterModel : PageModel
                     values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                     protocol: Request.Scheme)!;
 
-                await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _emailSender.SendEmailAsync(Input.Email, "RooMee - E-posta adresini onayla",
+    $"Merhaba {user.Ad},<br><br>RooMee hesabını onaylamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.<br><br>Bu kaydı sen yapmadıysan bu e-postayı yok sayabilirsin.");
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {

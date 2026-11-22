@@ -82,10 +82,8 @@ public class ResendEmailConfirmationModel : PageModel
             throw new InvalidOperationException("Users must have an email.");
         }
 
-        await _emailSender.SendEmailAsync(
-            storedEmail,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+        await _emailSender.SendEmailAsync(Input.Email, "RooMee - E-posta adresini onayla",
+    $"RooMee hesabını onaylamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.");
 
         ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
         return Page();

@@ -76,10 +76,8 @@ public class ForgotPasswordModel : PageModel
                 throw new InvalidOperationException("Users must have an email.");
             }
 
-            await _emailSender.SendEmailAsync(
-                storedEmail,
-                "Reset Password",
-                $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            await _emailSender.SendEmailAsync(Input.Email, "RooMee - Şifre sıfırlama",
+    $"Şifreni sıfırlamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.<br><br>Bu isteği sen yapmadıysan bu e-postayı yok sayabilirsin.");
 
             return RedirectToPage("./ForgotPasswordConfirmation");
         }

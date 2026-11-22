@@ -1,23 +1,17 @@
 @page
 @model RegisterConfirmationModel
 @{
-    ViewData["Title"] = "Register confirmation";
+    ViewData["Title"] = "Kaydın alındı";
 }
 
-<h1>@ViewData["Title"]</h1>
-@{
-    if (@Model.DisplayConfirmAccountLink)
-    {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
-    }
-    else
-    {
-<p>
-        Please check your email to confirm your account.
-</p>
-    }
-}
-
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5 text-center">
+        <h1 class="h3 mb-3">Kaydın alındı</h1>
+        <p>E-posta adresine bir onay bağlantısı gönderdik. Gelen kutunu (ve spam klasörünü) kontrol et; bağlantıya tıkladıktan sonra giriş yapabilirsin.</p>
+        @if (Model.DisplayConfirmAccountLink)
+        {
+            <p class="small text-muted">Geliştirme modu: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Hesabı onayla</a></p>
+        }
+        <a asp-page="./Login" class="btn btn-primary mt-2">Giriş sayfasına git</a>
+    </div>
+</div>
