@@ -85,9 +85,15 @@
             }
 
             <div class="mb-3">
-                <label asp-for="YeniFotolar" class="form-label"></label>
-                <input asp-for="YeniFotolar" type="file" multiple class="form-control" accept=".jpg,.jpeg,.png,.webp" />
-                <div class="form-text">En fazla 5 fotoğraf · JPG, PNG veya WEBP · her biri en fazla 3 MB</div>
+                <label class="form-label" for="YeniFotolar">Fotoğraf ekle</label>
+                <input type="file" name="YeniFotolar" id="YeniFotolar" class="form-control" multiple
+                       accept=".jpg,.jpeg,.png,.webp" data-mevcut="@Model.MevcutFotolar.Count" />
+                <div class="form-text">
+                    En fazla 5 fotoğraf · JPG, PNG veya WEBP · her biri en fazla 3 MB.
+                    Birden fazla kez seçebilirsin; seçtiklerin aşağıda birikir.
+                </div>
+                <div id="fotoUyari" class="text-danger small mt-1"></div>
+                <div id="fotoOnizleme" class="d-flex flex-wrap gap-2 mt-2"></div>
                 <span asp-validation-for="YeniFotolar" class="text-danger"></span>
             </div>
 
@@ -109,4 +115,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/ilan-foto.js" asp-append-version="true"></script>
 }

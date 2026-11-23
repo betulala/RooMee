@@ -154,6 +154,18 @@ public class IlanController : Controller
 
     // ---------- Yardımcılar ----------
 
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> YayinDurumu(int id)
+    {
+        var ilan = await SahibiOlunanIlan(id);
+        if (ilan == null) return NotFound();
+
+        ilan.Aktif = !ilan.Aktif;
+        await _db.SaveChangesAsync();
+
+        TempData["Mesaj"] = ilan.Aktif ? "İlan tekrar yayında." : "İlan yayından kaldırıldı.";
+        return RedirectToAction(nameof(Ilanlarim));
+    }
     private async Task<Ilan?> SahibiOlunanIlan(int id)
     {
         var benimId = _userManager.GetUserId(User);
