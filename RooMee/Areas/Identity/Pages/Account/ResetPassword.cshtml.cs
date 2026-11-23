@@ -49,7 +49,7 @@ public class ResetPasswordModel : PageModel
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "{0} en az {2} karakter olmalı.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         public string Password { get; set; } = default!;
 
@@ -58,8 +58,8 @@ public class ResetPasswordModel : PageModel
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Şifre tekrar")]
+        [Compare("Password", ErrorMessage = "Şifreler eşleşmiyor.")]
         public string? ConfirmPassword { get; set; }
 
         /// <summary>
@@ -75,7 +75,7 @@ public class ResetPasswordModel : PageModel
     {
         if (code == null)
         {
-            return BadRequest("A code must be supplied for password reset.");
+            return BadRequest("Şifre sıfırlamak için e-postandaki bağlantıyı kullanmalısın.");
         }
         else
         {

@@ -17,6 +17,14 @@ Adımlar:
    Bu, bilgisayarındaki LocalDB'de veritabanını oluşturur. Herkesin veritabanı kendi bilgisayarındadır, veriler paylaşılmaz.
 3. **F5** ile çalıştır.
 
+### Test verisi (isteğe bağlı)
+
+Boş veritabanında denemek için 5 örnek kullanıcı ve 15 ilan eklenebilir. Uygulama kapalıyken proje klasöründe:
+```
+dotnet run --project RooMee -- --test-verisi
+```
+Test hesaplarının e-postaları `mert@roomee.test`, `selin@roomee.test`, `zeynep@roomee.test`, `yusuf@roomee.test`, `elif@roomee.test`; şifreleri `Data/TestVerisi.cs` dosyasında yazıyor. Komut tekrar çalıştırılırsa aynı kullanıcıları ikinci kez eklemez.
+
 ## Çalışma düzeni
 
 `master` her zaman çalışan sürümdür. Kimse doğrudan `master`'a göndermez.

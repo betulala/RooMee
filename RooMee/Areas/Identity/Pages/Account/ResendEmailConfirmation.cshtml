@@ -1,22 +1,22 @@
 @page
 @model ResendEmailConfirmationModel
 @{
-    ViewData["Title"] = "Resend email confirmation";
+    ViewData["Title"] = "Onay e-postasını tekrar gönder";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h2>Enter your email.</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <h1 class="h3 mb-1">@ViewData["Title"]</h1>
+        <p class="text-muted mb-4">Kayıt olduğun e-posta adresini yaz, onay bağlantısını yeniden gönderelim.</p>
         <form method="post">
             <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="name@example.com" />
+            <div class="mb-3">
                 <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" aria-required="true" placeholder="ornek@mail.com" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Resend</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Tekrar gönder</button>
+            <p class="text-center mt-3"><a asp-page="./Login">Giriş sayfasına dön</a></p>
         </form>
     </div>
 </div>

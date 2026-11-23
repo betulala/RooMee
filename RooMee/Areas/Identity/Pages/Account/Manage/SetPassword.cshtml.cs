@@ -49,9 +49,9 @@ public class SetPasswordModel : PageModel
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "{0} en az {2} karakter olmalı.", MinimumLength = 8)]
         [DataType(DataType.Password)]
-        [Display(Name = "New password")]
+        [Display(Name = "Yeni şifre")]
         public string NewPassword { get; set; } = default!;
 
         /// <summary>
@@ -59,8 +59,8 @@ public class SetPasswordModel : PageModel
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm new password")]
-        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        [Display(Name = "Yeni şifre tekrar")]
+        [Compare("NewPassword", ErrorMessage = "Yeni şifreler eşleşmiyor.")]
         public string? ConfirmPassword { get; set; }
     }
 
@@ -69,7 +69,7 @@ public class SetPasswordModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         var hasPassword = await _userManager.HasPasswordAsync(user);
@@ -92,7 +92,7 @@ public class SetPasswordModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
@@ -106,7 +106,7 @@ public class SetPasswordModel : PageModel
         }
 
         await _signInManager.RefreshSignInAsync(user);
-        StatusMessage = "Your password has been set.";
+        StatusMessage = "Şifren oluşturuldu.";
 
         return RedirectToPage();
     }

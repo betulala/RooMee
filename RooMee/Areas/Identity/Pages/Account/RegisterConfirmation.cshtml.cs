@@ -55,7 +55,7 @@ public class RegisterConfirmationModel : PageModel
         var user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return NotFound($"Unable to load user with email '{email}'.");
+            return NotFound("Bu e-postaya ait kullanıcı bulunamadı.");
         }
 
         Email = email;

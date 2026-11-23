@@ -56,24 +56,29 @@ public class DeletePersonalDataModel : PageModel
     /// </summary>
     public bool RequirePassword { get; set; }
 
-    public async Task<IActionResult> OnGet()
+    // Hesap silme RooMee'nin kendi sayfasında yapılır (favori, mesaj, ilan ve fotoğrafları da temizler)
+    public IActionResult OnGet() => RedirectToAction("HesapSil", "Profil", new { area = "" });
+
+    public IActionResult OnPostAsync() => RedirectToAction("HesapSil", "Profil", new { area = "" });
+
+    private async Task<IActionResult> EskiOnGet()
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         RequirePassword = await _userManager.HasPasswordAsync(user);
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync()
+    private async Task<IActionResult> EskiOnPostAsync()
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         RequirePassword = await _userManager.HasPasswordAsync(user);
@@ -81,7 +86,7 @@ public class DeletePersonalDataModel : PageModel
         {
             if (!await _userManager.CheckPasswordAsync(user, Input.Password))
             {
-                ModelState.AddModelError(string.Empty, "Incorrect password.");
+                ModelState.AddModelError(string.Empty, "Şifre hatalı.");
                 return Page();
             }
         }

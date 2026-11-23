@@ -64,7 +64,7 @@ public class ResendEmailConfirmationModel : PageModel
         var user = await _userManager.FindByEmailAsync(Input.Email);
         if (user == null)
         {
-            ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+            ModelState.AddModelError(string.Empty, "Doğrulama e-postası gönderildi. Lütfen gelen kutunu kontrol et.");
             return Page();
         }
 
@@ -85,7 +85,7 @@ public class ResendEmailConfirmationModel : PageModel
         await _emailSender.SendEmailAsync(Input.Email, "RooMee - E-posta adresini onayla",
     $"RooMee hesabını onaylamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.");
 
-        ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
+        ModelState.AddModelError(string.Empty, "Doğrulama e-postası gönderildi. Lütfen gelen kutunu kontrol et.");
         return Page();
     }
 }

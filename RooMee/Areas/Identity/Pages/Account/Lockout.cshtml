@@ -1,10 +1,13 @@
 @page
 @model LockoutModel
 @{
-    ViewData["Title"] = "Locked out";
+    ViewData["Title"] = "Hesap geçici olarak kilitlendi";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">This account has been locked out, please try again later.</p>
-</header>
+<div class="text-center py-4">
+    <h1 class="h3 text-danger">@ViewData["Title"]</h1>
+    <p class="text-muted">
+        Çok sayıda hatalı giriş denemesi yapıldığı için hesabın 10 dakikalığına kilitlendi.<br />
+        Lütfen biraz sonra tekrar dene ya da <a asp-page="./ForgotPassword">şifreni sıfırla</a>.
+    </p>
+</div>

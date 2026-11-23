@@ -69,7 +69,7 @@ public class EmailModel : PageModel
         /// </summary>
         [Required]
         [EmailAddress]
-        [Display(Name = "New email")]
+        [Display(Name = "Yeni e-posta")]
         public string NewEmail { get; set; } = default!;
     }
 
@@ -91,7 +91,7 @@ public class EmailModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         await LoadAsync(user);
@@ -103,7 +103,7 @@ public class EmailModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         if (!ModelState.IsValid)
@@ -125,14 +125,14 @@ public class EmailModel : PageModel
                 protocol: Request.Scheme)!;
             await _emailSender.SendEmailAsync(
                 Input.NewEmail,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                "RooMee - E-posta adresini onayla",
+                $"RooMee hesabını onaylamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.");
 
-            StatusMessage = "Confirmation link to change email sent. Please check your email.";
+            StatusMessage = "E-posta değişikliği için onay bağlantısı gönderildi. Lütfen gelen kutunu kontrol et.";
             return RedirectToPage();
         }
 
-        StatusMessage = "Your email is unchanged.";
+        StatusMessage = "E-posta adresin değişmedi.";
         return RedirectToPage();
     }
 
@@ -141,7 +141,7 @@ public class EmailModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound("Kullanıcı bulunamadı.");
         }
 
         if (!ModelState.IsValid)
@@ -161,10 +161,10 @@ public class EmailModel : PageModel
             protocol: Request.Scheme)!;
         await _emailSender.SendEmailAsync(
             email!,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            "RooMee - E-posta adresini onayla",
+            $"RooMee hesabını onaylamak için <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>buraya tıkla</a>.");
 
-        StatusMessage = "Verification email sent. Please check your email.";
+        StatusMessage = "Doğrulama e-postası gönderildi. Lütfen gelen kutunu kontrol et.";
         return RedirectToPage();
     }
 }

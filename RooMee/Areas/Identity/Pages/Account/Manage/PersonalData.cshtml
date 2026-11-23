@@ -1,24 +1,27 @@
 @page
 @model PersonalDataModel
 @{
-    ViewData["Title"] = "Personal Data";
+    ViewData["Title"] = "Kişisel veriler";
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3 class="h5">@ViewData["Title"]</h3>
 
 <div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
+    <div class="col-md-8">
         <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
+            Hesabında bize verdiğin kişisel veriler bulunur. KVKK kapsamında bu verilerin bir kopyasını indirebilir
+            ya da hesabını ve tüm verilerini silebilirsin.
         </p>
-        <form id="download-data" asp-page="DownloadPersonalData" method="post">
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
         <p>
-            <a id="delete" asp-area="" asp-controller="Profil" asp-action="HesapSil" class="btn btn-danger">Delete</a>
+            <strong>Verilerini silmek hesabını kalıcı olarak kapatır ve bu işlem geri alınamaz.</strong>
         </p>
+        <div class="d-flex flex-wrap gap-2">
+            <form id="download-data" asp-page="DownloadPersonalData" method="post">
+                <button class="btn btn-primary" type="submit">Verilerimi indir</button>
+            </form>
+            <a id="delete" asp-area="" asp-controller="Profil" asp-action="HesapSil" class="btn btn-danger">Hesabımı sil</a>
+        </div>
     </div>
 </div>
 

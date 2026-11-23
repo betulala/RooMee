@@ -1,6 +1,46 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "KVKK Aydınlatma Metni";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+        <p class="text-muted small">Son güncelleme: 23.11.2026</p>
+
+        <p>
+            RooMee olarak kişisel verilerinin güvenliğine önem veriyoruz. Bu metin, 6698 sayılı Kişisel Verilerin
+            Korunması Kanunu (KVKK) kapsamında hangi verilerini neden işlediğimizi açıklar.
+        </p>
+
+        <h2 class="h5 mt-4">İşlenen veriler</h2>
+        <ul>
+            <li><strong>Kimlik ve iletişim:</strong> ad, soyad, e-posta adresi, telefon numarası (isteğe bağlı)</li>
+            <li><strong>Öğrenci doğrulama:</strong> üniversite e-posta adresi ve doğrulama tarihi</li>
+            <li><strong>Profil:</strong> üniversite, bölüm, bütçe, uyku düzeni, yaşam tarzı tercihleri, profil fotoğrafı</li>
+            <li><strong>İlanlar:</strong> ilan metni, konum (şehir/ilçe), kira bilgisi ve fotoğraflar</li>
+            <li><strong>Kullanım:</strong> favoriler, mesajlar ve şikayet kayıtları</li>
+        </ul>
+
+        <h2 class="h5 mt-4">İşleme amaçları</h2>
+        <ul>
+            <li>Hesabını oluşturmak ve güvenli giriş sağlamak</li>
+            <li>Ev arkadaşı ve oda ilanlarını yayınlamak, aramak ve eşleştirmek</li>
+            <li>Kullanıcılar arasında mesajlaşmayı sağlamak</li>
+            <li>Öğrencilik durumunu doğrulamak ve platform güvenliğini korumak</li>
+        </ul>
+
+        <h2 class="h5 mt-4">Paylaşım</h2>
+        <p>
+            Profilin ve ilanların, platformdaki diğer kullanıcılara gösterilir. E-posta adresin ve telefon numaran
+            diğer kullanıcılarla paylaşılmaz. Verilerin, yasal zorunluluklar dışında üçüncü kişilere aktarılmaz.
+        </p>
+
+        <h2 class="h5 mt-4">Haklarınız</h2>
+        <p>
+            KVKK'nın 11. maddesi uyarınca verilerinin işlenip işlenmediğini öğrenme, düzeltilmesini veya silinmesini isteme
+            haklarına sahipsin. Verilerinin bir kopyasını <a asp-area="Identity" asp-page="/Account/Manage/PersonalData">Kişisel veriler</a>
+            sayfasından indirebilir, hesabını ve tüm verilerini <a asp-controller="Profil" asp-action="HesapSil">Hesabımı sil</a>
+            sayfasından kalıcı olarak silebilirsin.
+        </p>
+    </div>
+</div>

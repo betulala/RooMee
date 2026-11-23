@@ -1,5 +1,6 @@
 using RooMee.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RooMee.Data;
 
@@ -22,11 +23,29 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<RooMee.Services.TurkceIdentityHatalari>();
+// Doğrulama ve form mesajları Türkçe (MVC sayfaları ve hesap sayfaları için)
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<MvcOptions>(o =>
+{
+    o.ModelMetadataDetailsProviders.Add(new RooMee.Services.TurkceDogrulamaMesajlari());
+    RooMee.Services.TurkceDogrulamaMesajlari.ModelBaglamaMesajlari(o);
+});
+
+// Tarih, sayı ve para biçimleri Türkçe (23.11.2026, 5.000 gibi)
+var turkce = new System.Globalization.CultureInfo("tr-TR");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = turkce;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = turkce;
 
 builder.Services.Configure<RooMee.Services.EpostaAyarlari>(builder.Configuration.GetSection("Eposta"));
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, RooMee.Services.SmtpEpostaGonderici>();
 var app = builder.Build();
+
+// Geliştirme için örnek veri: dotnet run --project RooMee -- --test-verisi
+if (args.Contains("--test-verisi"))
+{
+    await RooMee.Data.TestVerisi.YukleAsync(app.Services);
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

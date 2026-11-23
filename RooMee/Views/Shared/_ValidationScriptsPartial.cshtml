@@ -1,2 +1,23 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script>
+    // Tarayıcı tarafı doğrulamanın varsayılan mesajları (sunucu mesajı olmayan durumlar için)
+    $.extend($.validator.messages, {
+        required: "Bu alan zorunludur.",
+        remote: "Lütfen bu alanı düzelt.",
+        email: "Geçerli bir e-posta adresi gir.",
+        url: "Geçerli bir web adresi gir.",
+        date: "Geçerli bir tarih gir.",
+        dateISO: "Geçerli bir tarih gir.",
+        number: "Geçerli bir sayı gir.",
+        digits: "Sadece rakam gir.",
+        equalTo: "Değerler eşleşmiyor.",
+        maxlength: $.validator.format("En fazla {0} karakter girebilirsin."),
+        minlength: $.validator.format("En az {0} karakter girmelisin."),
+        rangelength: $.validator.format("{0} ile {1} karakter arasında bir değer gir."),
+        range: $.validator.format("{0} ile {1} arasında bir değer gir."),
+        max: $.validator.format("{0} veya daha küçük bir değer gir."),
+        min: $.validator.format("{0} veya daha büyük bir değer gir."),
+        step: $.validator.format("{0} katı olan bir değer gir.")
+    });
+</script>
 <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
