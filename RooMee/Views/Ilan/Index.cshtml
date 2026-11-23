@@ -98,6 +98,7 @@
             <label class="visually-hidden" for="f-sirala">Sırala</label>
             <select id="f-sirala" class="siralama">
                 <option value="" selected="@string.IsNullOrEmpty(Model.Siralama)">En yeni</option>
+                <option value="eski" selected="@(Model.Siralama == "eski")">En eski</option>
                 <option value="ucuz" selected="@(Model.Siralama == "ucuz")">Kira: en düşük</option>
                 <option value="pahali" selected="@(Model.Siralama == "pahali")">Kira: en yüksek</option>
             </select>

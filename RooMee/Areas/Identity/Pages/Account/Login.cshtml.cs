@@ -108,10 +108,6 @@ public class LoginModel : PageModel
                 _logger.LogInformation("User logged in.");
                 return LocalRedirect(returnUrl);
             }
-            if (result.RequiresTwoFactor)
-            {
-                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-            }
             if (result.IsNotAllowed)
             {
                 ModelState.AddModelError(string.Empty, "Giriş yapmadan önce e-posta adresini onaylamalısın.");

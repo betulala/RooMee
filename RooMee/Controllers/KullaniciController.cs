@@ -107,6 +107,7 @@ public class KullaniciController : Controller
             "butce-artan" => kartlar.OrderBy(k => k.Profil.Butce ?? int.MaxValue).ToList(),
             "butce-azalan" => kartlar.OrderByDescending(k => k.Profil.Butce ?? -1).ToList(),
             "yas-artan" => kartlar.OrderBy(k => k.Profil.Yas ?? int.MaxValue).ToList(),
+            "eski" => kartlar.OrderBy(k => k.Profil.GuncellemeTarihi).ToList(),
             _ => kartlar.OrderByDescending(k => k.Profil.GuncellemeTarihi).ToList(),
         };
 

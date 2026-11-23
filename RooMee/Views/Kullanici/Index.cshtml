@@ -177,6 +177,7 @@
                 <label class="visually-hidden" for="f-sirala">Sırala</label>
                 <select id="f-sirala" class="siralama">
                     <option value="" selected="@string.IsNullOrEmpty(Model.Siralama)">En yeni</option>
+                    <option value="eski" selected="@(Model.Siralama == "eski")">En eski</option>
                     @if (Model.UyumHesaplanabilir)
                     {
                         <option value="uyum" selected="@(Model.Siralama == "uyum")">En uyumlu</option>

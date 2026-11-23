@@ -67,6 +67,7 @@ public class IlanController : Controller
         {
             "ucuz" => q.OrderBy(i => i.Kira),
             "pahali" => q.OrderByDescending(i => i.Kira),
+            "eski" => q.OrderBy(i => i.OlusturmaTarihi),
             _ => q.OrderByDescending(i => i.OlusturmaTarihi)
         };
 

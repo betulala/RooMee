@@ -69,7 +69,40 @@ else
     app.UseHsts();
 }
 
+// İki adımlı doğrulama (doğrulama uygulaması) kullanılmıyor; güvenlik öğrenci e-postasına gönderilen
+// kodla sağlanıyor. Daha önce açan olduysa kapat, giriş yapamaz hale gelmesin.
+try
+{
+    using var kapsam = app.Services.CreateScope();
+    var db = kapsam.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Users.Where(u => u.TwoFactorEnabled).ExecuteUpdateAsync(s => s.SetProperty(u => u.TwoFactorEnabled, false));
+}
+catch (Exception ex)
+{
+    // Veritabanına o an ulaşılamıyorsa uygulama yine açılsın
+    app.Logger.LogWarning(ex, "İki adımlı doğrulama kapatılamadı (veritabanına ulaşılamadı).");
+}
+
 app.UseHttpsRedirection();
+
+// Kaldırılan iki adımlı doğrulama sayfaları (Identity'nin hazır İngilizce sayfaları açılmasın)
+string[] kaldirilanSayfalar =
+{
+    "/Identity/Account/Manage/TwoFactorAuthentication", "/Identity/Account/Manage/EnableAuthenticator",
+    "/Identity/Account/Manage/Disable2fa", "/Identity/Account/Manage/GenerateRecoveryCodes",
+    "/Identity/Account/Manage/ResetAuthenticator", "/Identity/Account/Manage/ShowRecoveryCodes",
+    "/Identity/Account/LoginWith2fa", "/Identity/Account/LoginWithRecoveryCode",
+};
+app.Use(async (context, next) =>
+{
+    var yol = context.Request.Path.Value ?? "";
+    if (kaldirilanSayfalar.Any(s => yol.Equals(s, StringComparison.OrdinalIgnoreCase)))
+    {
+        context.Response.Redirect(yol.Contains("/Manage/") ? "/Identity/Account/Manage" : "/Identity/Account/Login");
+        return;
+    }
+    await next();
+});
 app.UseRouting();
 
 app.UseAuthorization();
