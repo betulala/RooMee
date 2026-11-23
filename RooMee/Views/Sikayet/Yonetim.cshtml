@@ -12,7 +12,11 @@
     <div class="alert alert-success">@mesaj</div>
 }
 
-<h1 class="h3 mb-3">Şikayet yönetimi</h1>
+<div class="sayfa-ust">
+    <span class="ust-etiket">Yönetim</span>
+    <h1>Şikayet yönetimi</h1>
+    <p>Kullanıcıların bildirdiği ilan ve profilleri incele.</p>
+</div>
 
 <ul class="nav nav-tabs mb-3">
     @foreach (var d in Enum.GetValues<SikayetDurumu>())

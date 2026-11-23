@@ -1,6 +1,7 @@
 ﻿@model IlanAramaViewModel
 @{
     ViewData["Title"] = "İlanlar";
+    bool kriterVar = Model.SadeceOgrenci || Model.SigaraIcmeyen || Model.Sessiz || Model.EvcilHayvanKabul || Model.SadeceDogrulanmis;
 }
 @functions {
     // Sayfa bağlantılarında mevcut filtreleri korur
@@ -17,104 +18,102 @@
     <div class="alert alert-success">@mesaj</div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">İlanlar</h1>
-    <a asp-action="Olustur" class="btn btn-primary">+ İlan ver</a>
+<div class="sayfa-ust d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <span class="ust-etiket">İlanlar</span>
+        <h1>Oda ve ev arkadaşı ilanları</h1>
+        <p>Şehir, kira, oda tipi ve aradığın ev arkadaşı kriterlerine göre filtrele.</p>
+    </div>
+    <a asp-action="Olustur" class="ea-btn ea-btn-ana">+ İlan ver</a>
 </div>
 
-<div class="row g-4">
-    <!-- Filtre paneli -->
-    <div class="col-lg-3">
-        <form asp-action="Index" method="get" class="card card-body shadow-sm">
-            <h2 class="h6 mb-3">Filtrele</h2>
-
-            <div class="mb-2">
-                <label class="form-label small mb-1" for="Sehir">Şehir</label>
-                <input class="form-control form-control-sm" id="Sehir" name="Sehir" value="@Model.Sehir"
-                       list="sehirListesi" placeholder="Örn. Konya" />
-                <datalist id="sehirListesi">
+<div class="ea-yerlesim">
+    <!-- FİLTRE PANELİ -->
+    <aside class="filtre-paneli" aria-label="Filtreler">
+        <form id="filtre-form" asp-action="Index" method="get" autocomplete="off">
+            <div class="filtre-grup">
+                <label class="filtre-baslik" for="Sehir">Lokasyon</label>
+                <select id="Sehir" name="Sehir" class="mb-2">
+                    <option value="">Şehir: Tümü</option>
                     @foreach (var s in Model.Sehirler)
                     {
-                        <option value="@s"></option>
+                        <option value="@s" selected="@(string.Equals(Model.Sehir, s, StringComparison.OrdinalIgnoreCase))">@s</option>
                     }
-                </datalist>
+                </select>
+                <input type="text" id="Ilce" name="Ilce" value="@Model.Ilce" placeholder="İlçe (örn. Selçuklu)" aria-label="İlçe" />
             </div>
 
-            <div class="mb-2">
-                <label class="form-label small mb-1" for="Ilce">İlçe</label>
-                <input class="form-control form-control-sm" id="Ilce" name="Ilce" value="@Model.Ilce" placeholder="Örn. Selçuklu" />
+            <div class="filtre-grup">
+                <span class="filtre-baslik">Kira (₺)</span>
+                <div class="ikili">
+                    <input type="number" min="0" step="500" name="KiraMin" value="@Model.KiraMin" placeholder="Minimum" aria-label="En düşük kira" />
+                    <input type="number" min="0" step="500" name="KiraMax" value="@Model.KiraMax" placeholder="Maksimum" aria-label="En yüksek kira" />
+                </div>
             </div>
 
-            <label class="form-label small mb-1">Kira (TL)</label>
-            <div class="d-flex gap-2 mb-2">
-                <input class="form-control form-control-sm" type="number" min="0" name="KiraMin" value="@Model.KiraMin" placeholder="En az" />
-                <input class="form-control form-control-sm" type="number" min="0" name="KiraMax" value="@Model.KiraMax" placeholder="En fazla" />
-            </div>
+            <span class="filtre-baslik">Gelişmiş Filtreler</span>
 
-            <div class="mb-2">
-                <label class="form-label small mb-1" for="OdaTipi">Oda tipi</label>
-                <select class="form-select form-select-sm" id="OdaTipi" name="OdaTipi">
-                    <option value="">Hepsi</option>
+            <details class="acc" open="@Model.OdaTipi.HasValue">
+                <summary><span>🏠 Oda Tipi</span></summary>
+                <div class="acc-govde">
+                    <div class="kutu-satir">
+                        <input type="radio" name="OdaTipi" value="" id="oda-hepsi" checked="@(!Model.OdaTipi.HasValue)" />
+                        <label for="oda-hepsi">Hepsi</label>
+                    </div>
                     @foreach (var tip in Enum.GetValues<OdaTipi>())
                     {
-                        <option value="@tip" selected="@(Model.OdaTipi == tip)">@tip.GorunenAd()</option>
+                        <div class="kutu-satir">
+                            <input type="radio" name="OdaTipi" value="@tip" id="oda-@tip" checked="@(Model.OdaTipi == tip)" />
+                            <label for="oda-@tip">@tip.GorunenAd()</label>
+                        </div>
                     }
-                </select>
-            </div>
-
-            <label class="form-label small mb-1">Kriterler</label>
-            <div class="mb-2">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="f-ogr" name="SadeceOgrenci" value="true" checked="@Model.SadeceOgrenci" />
-                    <label class="form-check-label small" for="f-ogr">Öğrenci arayan</label>
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="f-sig" name="SigaraIcmeyen" value="true" checked="@Model.SigaraIcmeyen" />
-                    <label class="form-check-label small" for="f-sig">Sigara içmeyen</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="f-ses" name="Sessiz" value="true" checked="@Model.Sessiz" />
-                    <label class="form-check-label small" for="f-ses">Sessiz</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="f-evc" name="EvcilHayvanKabul" value="true" checked="@Model.EvcilHayvanKabul" />
-                    <label class="form-check-label small" for="f-evc">Evcil hayvan kabul</label>
-                </div>
-            </div>
+            </details>
 
-            <div class="form-check form-switch mb-3">
-                <input class="form-check-input" type="checkbox" id="f-dog" name="SadeceDogrulanmis" value="true" checked="@Model.SadeceDogrulanmis" />
-                <label class="form-check-label small" for="f-dog">Sadece doğrulanmış öğrenciler</label>
-            </div>
+            <details class="acc" open="@kriterVar">
+                <summary><span>👥 Ev Arkadaşı Kriterleri</span></summary>
+                <div class="acc-govde">
+                    <div class="kutu-satir"><input type="checkbox" id="f-ogr" name="SadeceOgrenci" value="true" checked="@Model.SadeceOgrenci" /><label for="f-ogr">Öğrenci arayan</label></div>
+                    <div class="kutu-satir"><input type="checkbox" id="f-sig" name="SigaraIcmeyen" value="true" checked="@Model.SigaraIcmeyen" /><label for="f-sig">Sigara içmeyen</label></div>
+                    <div class="kutu-satir"><input type="checkbox" id="f-ses" name="Sessiz" value="true" checked="@Model.Sessiz" /><label for="f-ses">Sessiz</label></div>
+                    <div class="kutu-satir"><input type="checkbox" id="f-evc" name="EvcilHayvanKabul" value="true" checked="@Model.EvcilHayvanKabul" /><label for="f-evc">Evcil hayvan kabul</label></div>
+                    <p class="alt-baslik">Güven</p>
+                    <div class="kutu-satir"><input type="checkbox" id="f-dog" name="SadeceDogrulanmis" value="true" checked="@Model.SadeceDogrulanmis" /><label for="f-dog">Sadece doğrulanmış öğrenciler</label></div>
+                </div>
+            </details>
 
-            <div class="mb-3">
-                <label class="form-label small mb-1" for="Siralama">Sırala</label>
-                <select class="form-select form-select-sm" id="Siralama" name="Siralama">
-                    <option value="" selected="@(string.IsNullOrEmpty(Model.Siralama))">En yeni</option>
-                    <option value="ucuz" selected="@(Model.Siralama == "ucuz")">Kira: en düşük</option>
-                    <option value="pahali" selected="@(Model.Siralama == "pahali")">Kira: en yüksek</option>
-                </select>
-            </div>
+            <input type="hidden" name="Siralama" id="f-siralama-gizli" value="@Model.Siralama" />
 
-            <button type="submit" class="btn btn-primary btn-sm w-100">Ara</button>
-            <a asp-action="Index" class="btn btn-link btn-sm w-100">Filtreleri temizle</a>
+            <div class="filtre-butonlar">
+                <button type="submit" class="ea-btn ea-btn-ana">🔍 Uygula</button>
+                <a asp-action="Index" class="ea-btn ea-btn-sade">Filtreleri Temizle</a>
+            </div>
         </form>
-    </div>
+    </aside>
 
-    <!-- Sonuçlar -->
-    <div class="col-lg-9">
-        <p class="text-muted small mb-2">@Model.ToplamSayi ilan bulundu</p>
+    <!-- SONUÇLAR -->
+    <section aria-label="Sonuçlar">
+        <div class="sonuc-ust">
+            <p aria-live="polite"><strong>@Model.ToplamSayi</strong> ilan bulundu</p>
+            <label class="visually-hidden" for="f-sirala">Sırala</label>
+            <select id="f-sirala" class="siralama">
+                <option value="" selected="@string.IsNullOrEmpty(Model.Siralama)">En yeni</option>
+                <option value="ucuz" selected="@(Model.Siralama == "ucuz")">Kira: en düşük</option>
+                <option value="pahali" selected="@(Model.Siralama == "pahali")">Kira: en yüksek</option>
+            </select>
+        </div>
 
         @if (!Model.Sonuclar.Any())
         {
-            <div class="text-center text-muted py-5">
-                Aradığın kriterlere uygun ilan bulunamadı.<br />
-                <a asp-action="Index">Tüm ilanları göster</a>
+            <div class="bos-durum">
+                <h3 class="h5">Aradığın kriterlere uygun ilan bulunamadı</h3>
+                <p>Filtrelerini genişletmeyi deneyebilirsin.</p>
+                <a asp-action="Index" class="ea-btn ea-btn-sade">Tüm ilanları göster</a>
             </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3">
+            <div class="kart-izgara">
                 @foreach (var ilan in Model.Sonuclar)
                 {
                     <partial name="_IlanKarti" model="ilan" />
@@ -141,5 +140,15 @@
                 </ul>
             </nav>
         }
-    </div>
+    </section>
 </div>
+
+@section Scripts {
+    <script>
+        // Sıralama değişince filtrelerle birlikte hemen uygula
+        document.getElementById('f-sirala').addEventListener('change', function () {
+            document.getElementById('f-siralama-gizli').value = this.value;
+            document.getElementById('filtre-form').submit();
+        });
+    </script>
+}

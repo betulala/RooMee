@@ -19,10 +19,6 @@
     string DurumSinifi(string durum) => durum switch { "Uyumlu" => "ok", "Kısmen" => "mid", _ => "low" };
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/kullanicilar.css" asp-append-version="true" />
-}
-
 <div class="ea">
     @if (TempData["Mesaj"] is string mesaj)
     {

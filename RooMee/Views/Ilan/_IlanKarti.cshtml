@@ -1,52 +1,62 @@
 ﻿@model Ilan
 @{
     var kapak = Model.Fotolar.FirstOrDefault()?.Yol;
+    var tr = new System.Globalization.CultureInfo("tr-TR");
 
-    // Kalp butonu sadece ilan listesinde, giriş yapmış kullanıcıya ve başkasının ilanında görünür
+    // Kalp butonu sadece giriş yapmış kullanıcıya ve başkasının ilanında görünür (ilan listesinde)
     var favoriIdleri = ViewData["FavoriIdleri"] as HashSet<int>;
     bool kalpGoster = favoriIdleri != null && Model.KullaniciId != ViewData["BenimId"] as string;
     bool favoride = favoriIdleri?.Contains(Model.Id) == true;
 }
-<div class="col position-relative">
-    <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.Id"
-       class="card h-100 text-decoration-none text-dark shadow-sm">
-        @if (kapak != null)
-        {
-            <img src="@kapak" class="card-img-top" style="height:180px;object-fit:cover" alt="" />
-        }
-        else
-        {
-            <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted"
-                 style="height:180px">
-                Fotoğraf yok
-            </div>
-        }
-        <div class="card-body">
-            <h2 class="h6 card-title mb-1">@Model.Baslik</h2>
-            <p class="fw-bold text-primary mb-1">@Model.Kira.ToString("N0") TL / ay</p>
-            <p class="small text-muted mb-2">@Model.Ilce, @Model.Sehir · @Model.OdaTipi.GorunenAd()</p>
-            <p class="small mb-0">
-                @Model.Kullanici?.KisaAd
-                @if (Model.Kullanici?.OgrenciDogrulandi == true)
-                {
-                    <span class="badge bg-success">✓ Öğrenci</span>
-                }
-            </p>
-            @if (!Model.Aktif)
+<div class="kart-sarmal">
+    <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.Id" class="kisi-karti ilan-karti"
+       aria-label="@Model.Baslik ilanını görüntüle">
+        <div class="ilan-foto">
+            @if (kapak != null)
             {
-                <span class="badge bg-secondary mt-2">Yayında değil</span>
+                <img src="@kapak" alt="" loading="lazy" />
             }
+            else
+            {
+                <span>Fotoğraf yok</span>
+            }
+        </div>
+        <div class="ilan-govde">
+            <h2>@Model.Baslik</h2>
+            <span class="konum">@Model.Ilce · @Model.Sehir.ToUpper(tr)</span>
+
+            <div class="etiketler">
+                <span class="etiket dolu">@Model.OdaTipi.GorunenAd()</span>
+                @if (Model.SadeceOgrenci) { <span class="etiket">Öğrenci arıyor</span> }
+                @if (Model.SigaraIcmeyen) { <span class="etiket">Sigara içmeyen</span> }
+                @if (Model.Sessiz) { <span class="etiket">Sessiz</span> }
+                @if (Model.EvcilHayvanKabul) { <span class="etiket">Evcil hayvan kabul</span> }
+                @if (Model.Kullanici?.OgrenciDogrulandi == true) { <span class="etiket vurgu">Doğrulanmış öğrenci</span> }
+                @if (!Model.Aktif) { <span class="etiket vurgu">Yayında değil</span> }
+            </div>
+
+            @if (Model.Kullanici != null)
+            {
+                <div class="ilan-sahibi">
+                    <partial name="~/Views/Kullanici/_Avatar.cshtml" model="Model.Kullanici" />
+                    <span>@Model.Kullanici.KisaAd</span>
+                </div>
+            }
+
+            <div class="kart-alt">
+                <div class="fiyat">@Model.Kira.ToString("N0", tr)₺<span> / ay</span></div>
+                <span class="ea-btn ea-btn-sade ea-btn-kucuk">Detay Gör</span>
+            </div>
         </div>
     </a>
 
     @if (kalpGoster)
     {
-        <form asp-controller="Favori" asp-action="Degistir" method="post"
-              class="position-absolute top-0 end-0 m-2 me-3">
+        <form asp-controller="Favori" asp-action="Degistir" method="post">
             <input type="hidden" name="ilanId" value="@Model.Id" />
             <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-            <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm text-danger"
-                    style="width:36px;height:36px" title="@(favoride ? "Favorilerden çıkar" : "Favorilere ekle")">
+            <button type="submit" class="kalp-butonu" title="@(favoride ? "Favorilerden çıkar" : "Favorilere ekle")"
+                    aria-label="@(favoride ? "Favorilerden çıkar" : "Favorilere ekle")">
                 @(favoride ? "♥" : "♡")
             </button>
         </form>

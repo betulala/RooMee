@@ -1,31 +1,171 @@
-html {
-  font-size: 14px;
+/* RooMee site teması.
+   Renkler ve biçim "Ev Arkadaşları" sayfasındaki (prototipten uyarlanan) tasarımla aynıdır.
+   Bootstrap bileşenleri CSS değişkenleriyle bu temaya uyarlanır; sayfaya özel parçalar kullanicilar.css'te. */
+
+:root {
+  --rm-primary: #1f6f63;
+  --rm-primary-dark: #15524a;
+  --rm-primary-light: #e3f1ee;
+  --rm-accent: #ff7a59;
+  --rm-accent-dark: #e8613f;
+  --rm-bg: #faf9f6;
+  --rm-surface: #ffffff;
+  --rm-text: #1f2933;
+  --rm-muted: #5b6672;
+  --rm-border: #e3e0da;
+  --rm-radius-sm: 8px;
+  --rm-radius-md: 14px;
+  --rm-shadow-sm: 0 2px 8px rgba(31, 41, 51, 0.06);
+  --rm-shadow-md: 0 8px 24px rgba(31, 41, 51, 0.10);
+
+  /* Bootstrap değişkenleri */
+  --bs-primary: #1f6f63;
+  --bs-primary-rgb: 31, 111, 99;
+  --bs-success: #1f6f63;
+  --bs-success-rgb: 31, 111, 99;
+  --bs-body-bg: #faf9f6;
+  --bs-body-color: #1f2933;
+  --bs-secondary-color: #5b6672;
+  --bs-border-color: #e3e0da;
+  --bs-link-color: #1f6f63;
+  --bs-link-color-rgb: 31, 111, 99;
+  --bs-link-hover-color: #15524a;
+  --bs-link-hover-color-rgb: 21, 82, 74;
+  --bs-border-radius: 8px;
+  --bs-border-radius-lg: 14px;
+  --bs-body-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Poppins", Roboto, sans-serif;
+  --bs-primary-bg-subtle: #e3f1ee;
+  --bs-primary-text-emphasis: #15524a;
+  --bs-primary-border-subtle: #c3e0da;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+html { font-size: 15px; position: relative; min-height: 100%; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+body { background: var(--rm-bg); color: var(--rm-text); display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1; }
+h1, .h1, h2, .h2, h3, .h3 { font-weight: 800; letter-spacing: -0.01em; }
+h4, .h4, h5, .h5, h6, .h6 { font-weight: 700; }
+a { color: var(--rm-primary); }
+a:hover { color: var(--rm-primary-dark); }
+.text-muted { color: var(--rm-muted) !important; }
+.bg-light { background-color: var(--rm-primary-light) !important; }
+
+/* ---------- Butonlar: ana eylem turuncu, ikincil eylemler yeşil ---------- */
+.btn { font-weight: 700; border-radius: var(--rm-radius-sm); }
+.btn-primary {
+  --bs-btn-bg: var(--rm-accent); --bs-btn-border-color: var(--rm-accent);
+  --bs-btn-hover-bg: var(--rm-accent-dark); --bs-btn-hover-border-color: var(--rm-accent-dark);
+  --bs-btn-active-bg: var(--rm-accent-dark); --bs-btn-active-border-color: var(--rm-accent-dark);
+  --bs-btn-disabled-bg: var(--rm-accent); --bs-btn-disabled-border-color: var(--rm-accent);
+  --bs-btn-focus-shadow-rgb: 255, 122, 89;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--rm-primary); --bs-btn-border-color: var(--rm-primary);
+  --bs-btn-hover-bg: var(--rm-primary); --bs-btn-hover-border-color: var(--rm-primary); --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--rm-primary-dark); --bs-btn-active-border-color: var(--rm-primary-dark);
+  --bs-btn-focus-shadow-rgb: 31, 111, 99;
+}
+.btn-success {
+  --bs-btn-bg: var(--rm-primary); --bs-btn-border-color: var(--rm-primary);
+  --bs-btn-hover-bg: var(--rm-primary-dark); --bs-btn-hover-border-color: var(--rm-primary-dark);
+  --bs-btn-active-bg: var(--rm-primary-dark); --bs-btn-active-border-color: var(--rm-primary-dark);
+}
+.btn-outline-success {
+  --bs-btn-color: var(--rm-primary); --bs-btn-border-color: var(--rm-primary);
+  --bs-btn-hover-bg: var(--rm-primary); --bs-btn-hover-border-color: var(--rm-primary);
+}
+/* İkincil (vazgeç, detay gör...) butonlar açık yeşil */
+.btn-outline-secondary, .btn-secondary {
+  --bs-btn-color: var(--rm-primary-dark); --bs-btn-bg: var(--rm-primary-light); --bs-btn-border-color: var(--rm-primary-light);
+  --bs-btn-hover-color: var(--rm-primary-dark); --bs-btn-hover-bg: #d3e8e3; --bs-btn-hover-border-color: #d3e8e3;
+  --bs-btn-active-color: var(--rm-primary-dark); --bs-btn-active-bg: #c3e0da; --bs-btn-active-border-color: #c3e0da;
+}
+.btn-light { --bs-btn-bg: #fff; --bs-btn-border-color: var(--rm-border); }
+.btn:focus-visible, .form-control:focus, .form-select:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 .2rem rgba(31, 111, 99, .2); border-color: var(--rm-primary);
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* ---------- Form alanları ---------- */
+.form-control, .form-select {
+  border-color: var(--rm-border); background-color: var(--rm-bg); border-radius: var(--rm-radius-sm);
+}
+.form-control:focus, .form-select:focus { background-color: #fff; }
+.form-label, legend.form-label { font-weight: 600; font-size: .92rem; }
+.form-check-input:checked { background-color: var(--rm-primary); border-color: var(--rm-primary); }
+.form-floating > .form-control::placeholder { color: var(--bs-secondary-color); text-align: end; }
+.form-floating > .form-control:focus::placeholder { text-align: start; }
+
+/* ---------- Kartlar, listeler, rozetler ---------- */
+.card { border: 1px solid var(--rm-border); border-radius: var(--rm-radius-md); background: var(--rm-surface); }
+.card.shadow-sm, .shadow-sm { box-shadow: var(--rm-shadow-sm) !important; }
+.card-header, .card-footer { background: var(--rm-surface); border-color: var(--rm-border); }
+.list-group { --bs-list-group-border-color: var(--rm-border); --bs-list-group-border-radius: var(--rm-radius-md); }
+.list-group-item-action:hover { background: var(--rm-bg); }
+.badge.bg-success { background: var(--rm-primary) !important; }
+.badge { font-weight: 600; }
+.alert { border-radius: var(--rm-radius-sm); border: none; }
+.alert-success { background: var(--rm-primary-light); color: var(--rm-primary-dark); }
+.alert-warning { background: #fff4d6; color: #6b4d00; }
+.alert-danger { background: #ffe9e1; color: #a1381c; }
+.table { --bs-table-bg: transparent; --bs-table-border-color: var(--rm-border); }
+
+/* Sekmeler ve sayfalama */
+.nav-pills { --bs-nav-pills-link-active-bg: var(--rm-primary); --bs-nav-pills-border-radius: var(--rm-radius-sm); }
+.nav-pills .nav-link { color: var(--rm-text); font-weight: 600; }
+.nav-tabs .nav-link { color: var(--rm-muted); font-weight: 600; }
+.nav-tabs .nav-link.active { color: var(--rm-primary-dark); }
+.pagination { --bs-pagination-color: var(--rm-primary-dark); --bs-pagination-active-bg: var(--rm-primary); --bs-pagination-active-border-color: var(--rm-primary); --bs-pagination-border-color: var(--rm-border); --bs-pagination-hover-color: var(--rm-primary-dark); }
+
+/* ---------- Üst menü ---------- */
+.site-header {
+  background: rgba(255, 255, 255, .95); border-bottom: 1px solid var(--rm-border);
+  position: sticky; top: 0; z-index: 1030; backdrop-filter: blur(6px);
+}
+.site-header .navbar { padding: 12px 0; }
+.site-header .navbar-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.35rem; color: var(--rm-primary-dark); }
+.logo-isareti {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--rm-primary); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: .95rem; font-weight: 800;
+}
+.site-header .nav-link { color: var(--rm-text); font-weight: 600; padding: 8px 12px !important; border-radius: var(--rm-radius-sm); white-space: nowrap; }
+.menu-avatar {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--rm-accent); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 800;
+}
+.dropdown-menu { border-color: var(--rm-border); border-radius: var(--rm-radius-md); box-shadow: var(--rm-shadow-md); padding: 6px; }
+.dropdown-item { border-radius: var(--rm-radius-sm); font-weight: 600; padding: 8px 12px; }
+.dropdown-item:hover, .dropdown-item:focus { background: var(--rm-primary-light); color: var(--rm-primary-dark); }
+.site-header .nav-link:hover { color: var(--rm-primary); }
+.site-header .nav-link.aktif { color: var(--rm-primary); }
+.site-header .nav-link.yonetim { color: var(--rm-accent-dark); }
+.site-header .btn-giris { border: 2px solid var(--rm-primary); color: var(--rm-primary); background: transparent; padding: 6px 16px; }
+.site-header .btn-giris:hover { background: var(--rm-primary); color: #fff; }
+.site-header .btn-kayit { background: var(--rm-accent); color: #fff; border: 2px solid var(--rm-accent); padding: 6px 16px; }
+.site-header .btn-kayit:hover { background: var(--rm-accent-dark); border-color: var(--rm-accent-dark); color: #fff; }
+
+/* ---------- Alt bilgi ---------- */
+.site-footer { border-top: 1px solid var(--rm-border); background: var(--rm-surface); color: var(--rm-muted); font-size: .88rem; padding: 22px 0; margin-top: 40px; }
+.site-footer a { color: var(--rm-muted); }
+.site-footer a:hover { color: var(--rm-primary); }
+
+/* ---------- Form sayfaları: ortalanmış sütundaki formlar kart görünümünde ---------- */
+.row.justify-content-center > [class*="col-"] > form:not(.text-center):not(.d-inline) {
+  background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-md);
+  padding: 24px; box-shadow: var(--rm-shadow-sm);
+}
+.form-kart {
+  background: var(--rm-surface); border: 1px solid var(--rm-border); border-radius: var(--rm-radius-md);
+  padding: 24px; box-shadow: var(--rm-shadow-sm);
+}
+.ust-etiket {
+  display: inline-block; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rm-accent-dark);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* ---------- Sayfa başlığı (tüm sayfalarda ortak) ---------- */
+.sayfa-ust { margin: 8px 0 22px; }
+.sayfa-ust .ust-etiket {
+  font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--rm-accent-dark);
 }
-
-body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
+.sayfa-ust h1 { font-size: 1.7rem; margin: 4px 0 6px; }
+.sayfa-ust p { color: var(--rm-muted); margin: 0; }

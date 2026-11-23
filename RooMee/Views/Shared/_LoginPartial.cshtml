@@ -4,7 +4,7 @@
 @inject RooMee.Data.ApplicationDbContext Db
 @using Microsoft.EntityFrameworkCore
 
-<ul class="navbar-nav">
+<ul class="navbar-nav align-items-lg-center gap-lg-1">
     @if (SignInManager.IsSignedIn(User))
     {
         var kullanici = await UserManager.GetUserAsync(User);
@@ -12,32 +12,40 @@
         var okunmamis = benimId == null ? 0 : await Db.Mesajlar.CountAsync(m =>
             !m.Okundu && m.GonderenId != benimId &&
             (m.Konusma!.Kullanici1Id == benimId || m.Konusma.Kullanici2Id == benimId));
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        var basHarfler = $"{kullanici?.Ad.FirstOrDefault()}{kullanici?.Soyad.FirstOrDefault()}".ToUpper(new System.Globalization.CultureInfo("tr-TR"));
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Mesaj" asp-action="Index">
-                Mesajlarım
+            <a class="nav-link @(controller == "Mesaj" ? "aktif" : "")" asp-area="" asp-controller="Mesaj" asp-action="Index">
+                ✉ Mesajlarım
                 @if (okunmamis > 0)
                 {
-                    <span class="badge rounded-pill bg-danger">@okunmamis</span>
+                    <span class="badge rounded-pill" style="background:var(--rm-accent)">@okunmamis</span>
                 }
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Profil" asp-action="Goruntule">Profilim (@kullanici?.Ad)</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="nav-link btn btn-link text-dark">Çıkış</button>
-            </form>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="menu-avatar">@basHarfler</span> @kullanici?.Ad
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" asp-area="" asp-controller="Profil" asp-action="Goruntule">👤 Profilim</a></li>
+                <li><a class="dropdown-item" asp-area="" asp-controller="Ilan" asp-action="Ilanlarim">🏠 İlanlarım</a></li>
+                <li><a class="dropdown-item" asp-area="" asp-controller="Favori" asp-action="Index">♥ Favorilerim</a></li>
+                <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">⚙ Hesap ayarları</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="dropdown-item">Çıkış yap</button>
+                    </form>
+                </li>
+            </ul>
         </li>
     }
     else
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Kayıt Ol</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Giriş Yap</a>
+        <li class="nav-item d-flex gap-2 py-2 py-lg-0">
+            <a class="btn btn-giris btn-sm" asp-area="Identity" asp-page="/Account/Login">Giriş Yap</a>
+            <a class="btn btn-kayit btn-sm" asp-area="Identity" asp-page="/Account/Register">Kayıt Ol</a>
         </li>
     }
 </ul>

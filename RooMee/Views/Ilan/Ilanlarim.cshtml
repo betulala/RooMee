@@ -1,6 +1,7 @@
 ﻿@model List<Ilan>
 @{
     ViewData["Title"] = "İlanlarım";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
 }
 
 @if (TempData["Mesaj"] is string mesaj)
@@ -8,65 +9,53 @@
     <div class="alert alert-success">@mesaj</div>
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">İlanlarım</h1>
-    <a asp-action="Olustur" class="btn btn-primary">+ Yeni ilan</a>
+<div class="sayfa-ust d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+        <span class="ust-etiket">Hesabım</span>
+        <h1>İlanlarım</h1>
+        <p>Verdiğin ilanları düzenle, yayından kaldır ya da sil.</p>
+    </div>
+    <a asp-action="Olustur" class="ea-btn ea-btn-ana">+ Yeni ilan</a>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="text-center text-muted py-5">
+    <div class="bos-durum">
         Henüz ilan vermedin.<br />
-        <a asp-action="Olustur" class="btn btn-outline-primary mt-3">İlk ilanını ver</a>
+        <a asp-action="Olustur" class="ea-btn ea-btn-ana">İlk ilanını ver</a>
     </div>
 }
 else
 {
-    <div class="list-group shadow-sm">
+    <div class="satir-liste">
         @foreach (var ilan in Model)
         {
             var kapak = ilan.Fotolar.FirstOrDefault()?.Yol;
-
-            <div class="list-group-item d-flex flex-wrap align-items-center gap-3 py-3">
+            <div class="satir-kart">
                 @if (kapak != null)
                 {
-                    <img src="@kapak" alt="" class="rounded" style="width:120px;height:90px;object-fit:cover" />
+                    <img src="@kapak" alt="" class="kucuk-foto" />
                 }
                 else
                 {
-                    <div class="rounded bg-light border d-flex align-items-center justify-content-center text-muted small"
-                         style="width:120px;height:90px">
-                        Fotoğraf yok
-                    </div>
+                    <div class="kucuk-foto">Fotoğraf yok</div>
                 }
 
-                <div class="flex-grow-1">
-                    <a asp-action="Detay" asp-route-id="@ilan.Id" class="fw-semibold text-decoration-none">@ilan.Baslik</a>
-                    @if (ilan.Aktif)
-                    {
-                        <span class="badge bg-success ms-1">Yayında</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary ms-1">Yayında değil</span>
-                    }
-                    <div class="small text-muted">
-                        @ilan.Ilce, @ilan.Sehir · @ilan.OdaTipi.GorunenAd() · @ilan.Kira.ToString("N0") TL / ay
-                    </div>
-                    <div class="small text-muted">
-                        Eklenme: @ilan.OlusturmaTarihi.ToLocalTime().ToString("dd.MM.yyyy") · @ilan.Fotolar.Count fotoğraf
+                <div class="govde">
+                    <a asp-action="Detay" asp-route-id="@ilan.Id" class="baslik">@ilan.Baslik</a>
+                    <div class="small text-muted mb-2">@ilan.Ilce · @ilan.Sehir · Eklenme: @ilan.OlusturmaTarihi.ToLocalTime().ToString("d MMMM yyyy", tr) · @ilan.Fotolar.Count fotoğraf</div>
+                    <div class="etiketler mb-0">
+                        <span class="etiket @(ilan.Aktif ? "dolu" : "vurgu")">@(ilan.Aktif ? "Yayında" : "Yayında değil")</span>
+                        <span class="etiket">@ilan.OdaTipi.GorunenAd()</span>
+                        <span class="etiket">@ilan.Kira.ToString("N0", tr)₺ / ay</span>
                     </div>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
                     <a asp-action="Duzenle" asp-route-id="@ilan.Id" class="btn btn-sm btn-outline-primary">Düzenle</a>
-
                     <form asp-action="YayinDurumu" asp-route-id="@ilan.Id" method="post">
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">
-                            @(ilan.Aktif ? "Yayından kaldır" : "Yayınla")
-                        </button>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@(ilan.Aktif ? "Yayından kaldır" : "Yayınla")</button>
                     </form>
-
                     <form asp-action="Sil" asp-route-id="@ilan.Id" method="post"
                           onsubmit="return confirm('Bu ilanı silmek istediğine emin misin?');">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>

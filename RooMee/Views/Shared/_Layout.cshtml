@@ -7,46 +7,38 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/kullanicilar.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RooMee.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RooMee</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Menüyü aç/kapat">
+@{
+    // Menüde bulunduğumuz sayfayı vurgulamak için
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string Aktif(string c, string? a = null) =>
+        string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) && (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase)) ? "aktif" : "";
+}
+<body class="ea">
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="logo-isareti">RM</span> RooMee
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ana-menu"
+                        aria-controls="ana-menu" aria-expanded="false" aria-label="Menüyü aç/kapat">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Ilan" asp-action="Index">İlanlar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Kullanici" asp-action="Index">Ev Arkadaşları</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Ilan" asp-action="Olustur">İlan Ver</a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Ilan" asp-action="Ilanlarim">İlanlarım</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Favori" asp-action="Index">Favorilerim</a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Hakkimizda">Hakkımızda</a>
-                        </li>
+                <div class="collapse navbar-collapse" id="ana-menu">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link @Aktif("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a></li>
+                        <li class="nav-item"><a class="nav-link @(Aktif("Ilan", "Index") + Aktif("Ilan", "Detay"))" asp-area="" asp-controller="Ilan" asp-action="Index">İlanlar</a></li>
+                        <li class="nav-item"><a class="nav-link @Aktif("Kullanici")" asp-area="" asp-controller="Kullanici" asp-action="Index">Ev Arkadaşları</a></li>
+                        <li class="nav-item"><a class="nav-link @Aktif("Ilan", "Olustur")" asp-area="" asp-controller="Ilan" asp-action="Olustur">İlan Ver</a></li>
+                        <li class="nav-item"><a class="nav-link @Aktif("Home", "Hakkimizda")" asp-area="" asp-controller="Home" asp-action="Hakkimizda">Hakkımızda</a></li>
                         @if (User.IsInRole(RooMee.Models.Roller.Yonetici))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-danger fw-semibold" asp-area="" asp-controller="Sikayet" asp-action="Yonetim">Şikayetler</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link yonetim @Aktif("Sikayet")" asp-area="" asp-controller="Sikayet" asp-action="Yonetim">Şikayetler</a></li>
                         }
                     </ul>
                     <partial name="_LoginPartial" />
@@ -54,17 +46,18 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 RooMee — Selçuk Üniversitesi Teknoloji Fakültesi, Bilgisayar Mühendisliği ·
-            <a asp-area="" asp-controller="Home" asp-action="Hakkimizda">Hakkımızda</a> ·
-            <a asp-area="" asp-controller="Home" asp-action="Privacy">KVKK Aydınlatma Metni</a>
+    <main role="main" class="container py-4">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>&copy; 2026 RooMee — Selçuk Üniversitesi Teknoloji Fakültesi, Bilgisayar Mühendisliği.</span>
+            <span>
+                <a asp-area="" asp-controller="Home" asp-action="Hakkimizda">Hakkımızda</a> ·
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">KVKK Aydınlatma Metni</a>
+            </span>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

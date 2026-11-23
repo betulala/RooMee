@@ -9,16 +9,20 @@
     }
 }
 
-<h1 class="h3">Hesap ayarları</h1>
+<div class="sayfa-ust">
+    <span class="ust-etiket">Hesabım</span>
+    <h1>Hesap ayarları</h1>
+    <p>E-posta, şifre ve hesap güvenliği ayarlarını buradan yönetebilirsin.</p>
+</div>
 
-<div>
-    <p class="text-muted">E-posta, şifre ve hesap güvenliği ayarlarını buradan yönetebilirsin.</p>
-    <hr />
-    <div class="row">
-        <div class="col-md-3 mb-3">
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="form-kart p-2">
             <partial name="_ManageNav" />
         </div>
-        <div class="col-md-9">
+    </div>
+    <div class="col-md-9">
+        <div class="form-kart">
             @RenderBody()
         </div>
     </div>
