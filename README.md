@@ -30,6 +30,22 @@ Sonra o hesapla çıkış yapıp tekrar giriş yapınca menüde **Yönetim** gö
 (sayılar, son 14 gün, son kayıtlar ve ilanlar), kullanıcı arama ve **askıya alma**, ilan yönetimi ve şikayetler bulunur.
 Askıya alınan hesap giriş yapamaz, ilanları ve profili diğer kullanıcılardan gizlenir; hesap tekrar açılınca hepsi geri gelir. Test verisi yüklendiyse `yonetici@roomee.test` hesabı zaten yöneticidir.
 
+## Canlı ortam (Azure)
+
+Site Azure App Service'te (Windows, .NET 10, Sweden Central), veritabanı Azure SQL'de çalışır. Sunucu ayarları
+Azure portalında **Web uygulaması → Ayarlar → Ortam değişkenleri → Uygulama ayarları** bölümündedir (şifreler kodda yoktur):
+
+| Ayar | Açıklama |
+|---|---|
+| `ConnectionStrings__DefaultConnection` | Azure SQL bağlantı metni |
+| `Eposta__Sunucu`, `Eposta__Port`, `Eposta__Kullanici`, `Eposta__Sifre`, `Eposta__GonderenEposta`, `Eposta__GonderenAd` | SMTP (e-posta) ayarları |
+| `IlkYonetici` | Bu e-postayla giriş yapan kişi otomatik yönetici olur |
+
+- Veritabanı tabloları uygulama açılırken otomatik oluşturulur/güncellenir.
+- Yüklenen fotoğraflar Azure'da kalıcı veri klasöründe (`%HOME%\data\uploads`) tutulur, yeni yayında silinmez.
+  Başka bir klasör kullanmak için `Yuklemeler__Klasor` ayarı verilebilir.
+- Yayınlamak için Visual Studio'da projeye sağ tık → **Yayımla** → Azure App Service.
+
 ## Testler
 
 `RooMee.Tests` projesinde otomatik testler var: uyum hesaplama, ilan filtreleri, kayıtlı arama kriterleri,

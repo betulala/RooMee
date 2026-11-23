@@ -38,6 +38,25 @@ public static class Yoneticiler
             : "Hata: " + string.Join(", ", sonuc.Errors.Select(e => e.Description)));
     }
 
+    // Sunucu ayarındaki "IlkYonetici" e-postası kayıtlıysa ve henüz yönetici değilse yönetici yapar.
+    // eposta verilirse sadece o kişi için kontrol eder (girişte kullanılır). Yönetici yapıldıysa true döner.
+    public static async Task<bool> IlkYoneticiyiKontrolEtAsync(IServiceProvider servisler, string? eposta)
+    {
+        var ilk = servisler.GetRequiredService<IConfiguration>()["IlkYonetici"]?.Trim();
+        if (string.IsNullOrEmpty(ilk)) return false;
+        if (eposta != null && !string.Equals(eposta.Trim(), ilk, StringComparison.OrdinalIgnoreCase)) return false;
+
+        using var kapsam = servisler.CreateScope();
+        var roller = kapsam.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var kullanicilar = kapsam.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        var k = await kullanicilar.FindByEmailAsync(ilk);
+        if (k == null || await kullanicilar.IsInRoleAsync(k, Roller.Yonetici)) return false;
+
+        await RolOlusturAsync(roller);
+        return (await kullanicilar.AddToRoleAsync(k, Roller.Yonetici)).Succeeded;
+    }
+
     public static async Task RolOlusturAsync(RoleManager<IdentityRole> roller)
     {
         if (!await roller.RoleExistsAsync(Roller.Yonetici))

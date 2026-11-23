@@ -44,6 +44,7 @@ builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSe
 builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
 builder.Services.AddScoped<RooMee.Services.Bildirimci>();
 builder.Services.AddScoped<RooMee.Services.AramaUyarilari>();
+builder.Services.AddSingleton<RooMee.Services.Yuklemeler>();
 var app = builder.Build();
 
 // Geliştirme için örnek veri: dotnet run --project RooMee -- --test-verisi
@@ -83,6 +84,8 @@ try
     // Bekleyen veritabanı değişikliklerini (migration) otomatik uygula; Update-Database'e gerek kalmaz
     await db.Database.MigrateAsync();
     await db.Users.Where(u => u.TwoFactorEnabled).ExecuteUpdateAsync(s => s.SetProperty(u => u.TwoFactorEnabled, false));
+    // "IlkYonetici" ayarındaki e-posta kayıtlıysa yönetici yap (kayıtlı değilse ilk girişinde yapılır)
+    await RooMee.Data.Yoneticiler.IlkYoneticiyiKontrolEtAsync(app.Services, null);
 }
 catch (Exception ex)
 {
@@ -115,6 +118,14 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// Kullanıcıların yüklediği fotoğraflar (/uploads/...). Azure'da kalıcı veri klasöründen sunulur.
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        app.Services.GetRequiredService<RooMee.Services.Yuklemeler>().Kok),
+    RequestPath = "/uploads"
+});
 
 app.MapControllerRoute(
     name: "default",

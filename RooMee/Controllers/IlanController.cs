@@ -280,8 +280,7 @@ public class IlanController : Controller
     {
         if (vm.YeniFotolar == null) return;
 
-        var klasor = Path.Combine(_env.WebRootPath, "uploads", "ilan");
-        Directory.CreateDirectory(klasor);
+        var klasor = Yuklemeler.Klasor("ilan");
 
         foreach (var f in vm.YeniFotolar.Where(f => f.Length > 0))
         {
@@ -292,10 +291,9 @@ public class IlanController : Controller
         }
     }
 
-    private void DosyaSil(string? yol)
-    {
-        if (string.IsNullOrEmpty(yol)) return;
-        var tamYol = Path.Combine(_env.WebRootPath, yol.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-        if (System.IO.File.Exists(tamYol)) System.IO.File.Delete(tamYol);
-    }
+    private void DosyaSil(string? yol) => Yuklemeler.Sil(yol);
+
+    // Fotoğrafların diskteki yeri (bkz. Services/Yuklemeler.cs)
+    private RooMee.Services.Yuklemeler Yuklemeler =>
+        HttpContext.RequestServices.GetRequiredService<RooMee.Services.Yuklemeler>();
 }

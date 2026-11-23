@@ -136,8 +136,7 @@ public class ProfilController : Controller
 
         if (vm.Foto != null && vm.Foto.Length > 0)
         {
-            var klasor = Path.Combine(_env.WebRootPath, "uploads", "profil");
-            Directory.CreateDirectory(klasor);
+            var klasor = Yuklemeler.Klasor("profil");
             var dosyaAdi = $"{Guid.NewGuid()}{Path.GetExtension(vm.Foto.FileName).ToLowerInvariant()}";
 
             using (var akis = System.IO.File.Create(Path.Combine(klasor, dosyaAdi)))
@@ -318,10 +317,9 @@ public class ProfilController : Controller
         return await _db.Users.Include(u => u.Profil).FirstAsync(u => u.Id == id);
     }
 
-    private void EskiFotoyuSil(string? yol)
-    {
-        if (string.IsNullOrEmpty(yol)) return;
-        var tamYol = Path.Combine(_env.WebRootPath, yol.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
-        if (System.IO.File.Exists(tamYol)) System.IO.File.Delete(tamYol);
-    }
+    private void EskiFotoyuSil(string? yol) => Yuklemeler.Sil(yol);
+
+    // Fotoğrafların diskteki yeri (bkz. Services/Yuklemeler.cs)
+    private RooMee.Services.Yuklemeler Yuklemeler =>
+        HttpContext.RequestServices.GetRequiredService<RooMee.Services.Yuklemeler>();
 }

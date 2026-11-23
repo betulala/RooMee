@@ -106,6 +106,12 @@ public class LoginModel : PageModel
             if (result.Succeeded)
             {
                 _logger.LogInformation("User logged in.");
+                // "IlkYonetici" ayarındaki e-postayla giren kişi ilk girişinde yönetici yapılır
+                if (await RooMee.Data.Yoneticiler.IlkYoneticiyiKontrolEtAsync(HttpContext.RequestServices, Input.Email))
+                {
+                    var k = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                    if (k != null) await _signInManager.RefreshSignInAsync(k);
+                }
                 return LocalRedirect(returnUrl);
             }
             if (result.IsNotAllowed)
