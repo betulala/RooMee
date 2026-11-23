@@ -1,5 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<Ilan>
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var sehirler = ViewBag.Sehirler as List<string> ?? new();
 }
 
 @if (TempData["Mesaj"] is string mesaj)
@@ -7,7 +9,70 @@
     <div class="alert alert-success">@mesaj</div>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Karşılama ve arama -->
+<section class="text-center py-5 mb-4 bg-light rounded-3">
+    <h1 class="display-5 fw-bold mb-3">Ev arkadaşını RooMee'de bul</h1>
+    <p class="lead text-muted mb-4">
+        Öğrenciler için oda ve ev arkadaşı ilanları. Doğrulanmış öğrencilerle güvenle eşleş.
+    </p>
+
+    <form asp-controller="Ilan" asp-action="Index" method="get"
+          class="d-flex flex-column flex-sm-row gap-2 mx-auto" style="max-width:560px">
+        <input class="form-control form-control-lg" name="Sehir"
+               list="anaSehirListesi" placeholder="Hangi şehirde arıyorsun?" />
+        <datalist id="anaSehirListesi">
+            @foreach (var s in sehirler)
+            {
+                <option value="@s"></option>
+            }
+        </datalist>
+        <button type="submit" class="btn btn-primary btn-lg text-nowrap">İlan ara</button>
+    </form>
+
+    <div class="mt-3">
+        <a asp-controller="Ilan" asp-action="Olustur" class="link-secondary">Odan mı var? Ücretsiz ilan ver →</a>
+    </div>
+</section>
+
+<!-- Nasıl çalışır -->
+<section class="row text-center g-4 mb-5">
+    <div class="col-md-4">
+        <div class="fs-2 mb-2">🔍</div>
+        <h2 class="h5">Ara ve filtrele</h2>
+        <p class="text-muted small mb-0">Şehir, kira, oda tipi ve yaşam tarzına göre sana uygun ilanları bul.</p>
+    </div>
+    <div class="col-md-4">
+        <div class="fs-2 mb-2">✓</div>
+        <h2 class="h5">Öğrenciliğini doğrula</h2>
+        <p class="text-muted small mb-0">Üniversite e-postanla doğrula, profilinde "Doğrulanmış öğrenci" rozeti çıksın.</p>
+    </div>
+    <div class="col-md-4">
+        <div class="fs-2 mb-2">♥</div>
+        <h2 class="h5">Favorile ve karar ver</h2>
+        <p class="text-muted small mb-0">Beğendiğin ilanları favorilerine ekle, sonra rahatça karşılaştır.</p>
+    </div>
+</section>
+
+<!-- Son ilanlar -->
+<section class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Son ilanlar</h2>
+        <a asp-controller="Ilan" asp-action="Index">Tümünü gör →</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center text-muted py-4">
+            Henüz ilan yok. <a asp-controller="Ilan" asp-action="Olustur">İlk ilanı sen ver!</a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+            @foreach (var ilan in Model)
+            {
+                <partial name="~/Views/Ilan/_IlanKarti.cshtml" model="ilan" />
+            }
+        </div>
+    }
+</section>

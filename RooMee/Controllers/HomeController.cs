@@ -1,14 +1,39 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RooMee.Data;
 using RooMee.Models;
 
 namespace RooMee.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly ApplicationDbContext _db;
+
+    public HomeController(ApplicationDbContext db)
     {
-        return View();
+        _db = db;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        // Ana sayfada gösterilecek en yeni ilanlar
+        var sonIlanlar = await _db.Ilanlar
+            .Where(i => i.Aktif)
+            .Include(i => i.Kullanici)
+            .Include(i => i.Fotolar)
+            .OrderByDescending(i => i.OlusturmaTarihi)
+            .Take(6)
+            .ToListAsync();
+
+        ViewBag.Sehirler = await _db.Ilanlar
+            .Where(i => i.Aktif)
+            .Select(i => i.Sehir)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToListAsync();
+
+        return View(sonIlanlar);
     }
 
     public IActionResult Privacy()
