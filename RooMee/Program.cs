@@ -81,8 +81,24 @@ try
 {
     using var kapsam = app.Services.CreateScope();
     var db = kapsam.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // Bekleyen veritabanı değişikliklerini (migration) otomatik uygula; Update-Database'e gerek kalmaz
-    await db.Database.MigrateAsync();
+    // Bekleyen veritabanı değişikliklerini (migration) otomatik uygula; Update-Database'e gerek kalmaz.
+    // Azure SQL'in ücretsiz veritabanı uykudan uyanırken ilk bağlantılar zaman aşımına uğrayabilir;
+    // bu yüzden yaklaşık 2 dakika boyunca tekrar denenir.
+    var azureMi = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+    var enFazlaDeneme = azureMi ? 8 : 1;
+    for (var deneme = 1; ; deneme++)
+    {
+        try
+        {
+            await db.Database.MigrateAsync();
+            break;
+        }
+        catch (Exception ex) when (deneme < enFazlaDeneme)
+        {
+            app.Logger.LogWarning(ex, "Veritabanına bağlanılamadı (deneme {Deneme}/{EnFazla}), 15 sn sonra tekrar denenecek.", deneme, enFazlaDeneme);
+            await Task.Delay(TimeSpan.FromSeconds(15));
+        }
+    }
     await db.Users.Where(u => u.TwoFactorEnabled).ExecuteUpdateAsync(s => s.SetProperty(u => u.TwoFactorEnabled, false));
     // "IlkYonetici" ayarındaki e-posta kayıtlıysa yönetici yap (kayıtlı değilse ilk girişinde yapılır)
     await RooMee.Data.Yoneticiler.IlkYoneticiyiKontrolEtAsync(app.Services, null);
@@ -90,7 +106,7 @@ try
 catch (Exception ex)
 {
     // Veritabanına o an ulaşılamıyorsa uygulama yine açılsın
-    app.Logger.LogWarning(ex, "İki adımlı doğrulama kapatılamadı (veritabanına ulaşılamadı).");
+    app.Logger.LogError(ex, "Açılışta veritabanı hazırlanamadı (migration / ilk yönetici). Bağlantı metnini kontrol et.");
 }
 
 app.UseHttpsRedirection();
