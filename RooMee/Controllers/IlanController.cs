@@ -89,6 +89,17 @@ public class IlanController : Controller
             .OrderBy(s => s)
             .ToListAsync();
 
+        // Giriş yapmış kullanıcının favorileri (kartlardaki kalp butonu için)
+        var benimId = _userManager.GetUserId(User);
+        if (benimId != null)
+        {
+            ViewData["BenimId"] = benimId;
+            ViewData["FavoriIdleri"] = (await _db.Favoriler
+                .Where(x => x.KullaniciId == benimId)
+                .Select(x => x.IlanId)
+                .ToListAsync()).ToHashSet();
+        }
+
         return View(f);
     }
 

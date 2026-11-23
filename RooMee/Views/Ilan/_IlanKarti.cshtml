@@ -1,8 +1,13 @@
 ﻿@model Ilan
 @{
     var kapak = Model.Fotolar.FirstOrDefault()?.Yol;
+
+    // Kalp butonu sadece ilan listesinde, giriş yapmış kullanıcıya ve başkasının ilanında görünür
+    var favoriIdleri = ViewData["FavoriIdleri"] as HashSet<int>;
+    bool kalpGoster = favoriIdleri != null && Model.KullaniciId != ViewData["BenimId"] as string;
+    bool favoride = favoriIdleri?.Contains(Model.Id) == true;
 }
-<div class="col">
+<div class="col position-relative">
     <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.Id"
        class="card h-100 text-decoration-none text-dark shadow-sm">
         @if (kapak != null)
@@ -33,4 +38,17 @@
             }
         </div>
     </a>
+
+    @if (kalpGoster)
+    {
+        <form asp-controller="Favori" asp-action="Degistir" method="post"
+              class="position-absolute top-0 end-0 m-2 me-3">
+            <input type="hidden" name="ilanId" value="@Model.Id" />
+            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+            <button type="submit" class="btn btn-light btn-sm rounded-circle shadow-sm text-danger"
+                    style="width:36px;height:36px" title="@(favoride ? "Favorilerden çıkar" : "Favorilere ekle")">
+                @(favoride ? "♥" : "♡")
+            </button>
+        </form>
+    }
 </div>

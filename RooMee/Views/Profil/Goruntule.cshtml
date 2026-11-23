@@ -101,5 +101,18 @@
                 </div>
             </div>
         </div>
+
+        @if (kendi)
+        {
+            <div class="card shadow-sm mt-3">
+                <div class="card-body">
+                    <h2 class="h6 mb-3">Hesap ayarları</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-sm btn-outline-secondary">Şifre ve hesap ayarları</a>
+                        <a asp-action="HesapSil" class="btn btn-sm btn-outline-danger">Hesabımı sil</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>
