@@ -16,6 +16,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Sikayet> Sikayetler => Set<Sikayet>();
     public DbSet<Konusma> Konusmalar => Set<Konusma>();
     public DbSet<Mesaj> Mesajlar => Set<Mesaj>();
+    public DbSet<KayitliArama> KayitliAramalar => Set<KayitliArama>();
+    public DbSet<Degerlendirme> Degerlendirmeler => Set<Degerlendirme>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -86,5 +88,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .OnDelete(DeleteBehavior.NoAction);
         builder.Entity<Mesaj>()
             .HasIndex(m => new { m.KonusmaId, m.Tarih });
+
+        // Kullanıcı silinince kayıtlı aramaları da silinir
+        builder.Entity<KayitliArama>()
+            .HasOne(a => a.Kullanici).WithMany()
+            .HasForeignKey(a => a.KullaniciId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<KayitliArama>().Ignore(a => a.Kriter);
+
+        // Değerlendirmeler: kişi başına tek değerlendirme; hesap silinince elle silinir
+        builder.Entity<Degerlendirme>()
+            .HasIndex(d => new { d.YazanId, d.HakkindaId }).IsUnique();
+        builder.Entity<Degerlendirme>()
+            .HasOne(d => d.Yazan).WithMany()
+            .HasForeignKey(d => d.YazanId)
+            .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Degerlendirme>()
+            .HasOne(d => d.Hakkinda).WithMany()
+            .HasForeignKey(d => d.HakkindaId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

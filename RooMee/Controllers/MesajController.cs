@@ -14,11 +14,29 @@ public class MesajController : Controller
 
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RooMee.Services.Bildirimci _bildirimci;
 
-    public MesajController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+    public MesajController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RooMee.Services.Bildirimci bildirimci)
     {
         _db = db;
         _userManager = userManager;
+        _bildirimci = bildirimci;
+    }
+
+    // Karşı tarafa e-posta bildirimi. Okunmamış tek mesaj buysa gönderilir;
+    // böylece arka arkaya yazılan mesajlar için her seferinde e-posta gitmez.
+    private async Task MesajBildirimiGonder(Konusma konusma, string benimId, string metin)
+    {
+        var aliciId = konusma.KarsiTarafId(benimId);
+        var okunmamis = await _db.Mesajlar.CountAsync(m => m.KonusmaId == konusma.Id && m.GonderenId == benimId && !m.Okundu);
+        if (okunmamis != 1) return;
+
+        var alici = await _db.Users.FirstOrDefaultAsync(u => u.Id == aliciId);
+        var ben = await _db.Users.FirstOrDefaultAsync(u => u.Id == benimId);
+        if (alici == null || ben == null) return;
+
+        var adres = Url.Action(nameof(Konusma), "Mesaj", new { id = konusma.Id }, Request.Scheme)!;
+        await _bildirimci.YeniMesajAsync(alici, ben, metin, adres);
     }
 
     private string BenimId => _userManager.GetUserId(User)!;
@@ -68,6 +86,41 @@ public class MesajController : Controller
 
         ViewBag.BenimId = benimId;
         return View(konusma);
+    }
+
+    // Konuşma ekranının birkaç saniyede bir çağırdığı adres:
+    // sonId'den sonraki mesajları HTML olarak döner, bana gelenleri okundu yapar,
+    // karşı tarafın okuduğu mesajlarımın id'lerini X-Okunanlar başlığında gönderir.
+    public async Task<IActionResult> Yeniler(int konusmaId, int sonId)
+    {
+        var benimId = BenimId;
+        var konusma = await _db.Konusmalar.FirstOrDefaultAsync(k => k.Id == konusmaId);
+        if (konusma == null || (konusma.Kullanici1Id != benimId && konusma.Kullanici2Id != benimId))
+            return NotFound();
+
+        var yeniler = await _db.Mesajlar
+            .Where(m => m.KonusmaId == konusmaId && m.Id > sonId)
+            .OrderBy(m => m.Id)
+            .ToListAsync();
+
+        if (yeniler.Any(m => m.GonderenId != benimId && !m.Okundu))
+        {
+            await _db.Mesajlar
+                .Where(m => m.KonusmaId == konusmaId && m.GonderenId != benimId && !m.Okundu)
+                .ExecuteUpdateAsync(s => s.SetProperty(m => m.Okundu, true));
+        }
+
+        var okunanlar = await _db.Mesajlar
+            .Where(m => m.KonusmaId == konusmaId && m.GonderenId == benimId && m.Okundu)
+            .OrderByDescending(m => m.Id)
+            .Select(m => m.Id)
+            .Take(50)
+            .ToListAsync();
+        Response.Headers["X-Okunanlar"] = string.Join(",", okunanlar);
+        Response.Headers.CacheControl = "no-store";
+
+        ViewData["BenimId"] = benimId;
+        return PartialView("_YeniMesajlar", yeniler);
     }
 
     // "İletişime geç" / "Mesaj gönder" butonu buraya gelir
@@ -123,6 +176,7 @@ public class MesajController : Controller
         konusma.Mesajlar.Add(new Mesaj { GonderenId = benimId, Metin = metin });
         konusma.SonMesajTarihi = DateTime.UtcNow;
         await _db.SaveChangesAsync();
+        await MesajBildirimiGonder(konusma, benimId, metin);
 
         return RedirectToAction(nameof(Konusma), new { id = konusma.Id });
     }
@@ -143,6 +197,7 @@ public class MesajController : Controller
             _db.Mesajlar.Add(new Mesaj { KonusmaId = konusmaId, GonderenId = benimId, Metin = metin });
             konusma.SonMesajTarihi = DateTime.UtcNow;
             await _db.SaveChangesAsync();
+            await MesajBildirimiGonder(konusma, benimId, metin);
         }
 
         return RedirectToAction(nameof(Konusma), new { id = konusmaId });

@@ -37,7 +37,9 @@
     </div>
 </section>
 
-<!-- Nasıl çalışır -->
+<!-- Nasıl çalışır (giriş yapmamış ziyaretçiler için; giriş yapanlar yerine kişisel önerileri görür) -->
+@if (User.Identity?.IsAuthenticated != true)
+{
 <section class="bolum pt-0">
     <div class="bolum-baslik">
         <span class="ust-etiket">Nasıl çalışır?</span>
@@ -67,6 +69,71 @@
         </div>
     </div>
 </section>
+}
+
+<!-- Sana özel öneriler (giriş yapan kullanıcı) -->
+@if (User.Identity?.IsAuthenticated == true)
+{
+    var oneriKisiler = ViewBag.OneriKisiler as List<KullaniciKartViewModel> ?? new();
+    var oneriIlanlar = ViewBag.OneriIlanlar as List<Ilan> ?? new();
+    string? oneriSehir = ViewBag.OneriSehir;
+    int? oneriButce = ViewBag.OneriButce;
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+
+    <section class="bolum pt-0">
+        <div class="mb-3">
+            <span class="ust-etiket">Sana özel</span>
+            <h2 class="h3 mb-0">Önerilerimiz</h2>
+        </div>
+
+        @if (ViewBag.ProfilVar != true)
+        {
+            <div class="form-kart d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <span>Profilindeki yaşam tercihlerini ve bütçeni doldurursan sana en uyumlu ev arkadaşlarını ve ilanları önerebiliriz.</span>
+                <a asp-controller="Profil" asp-action="Duzenle" class="ea-btn ea-btn-ana">Profilini doldur</a>
+            </div>
+        }
+        else
+        {
+            @if (oneriKisiler.Any())
+            {
+                <div class="d-flex justify-content-between align-items-end mb-2">
+                    <h3 class="h6 mb-0">Sana en uyumlu ev arkadaşları</h3>
+                    <a asp-controller="Kullanici" asp-action="Index" asp-route-Siralama="uyum" class="small">Hepsini uyuma göre sırala →</a>
+                </div>
+                <div class="kart-izgara uc mb-4">
+                    @foreach (var k in oneriKisiler)
+                    {
+                        <partial name="~/Views/Kullanici/_KisiKarti.cshtml" model="k" />
+                    }
+                </div>
+            }
+
+            <div class="d-flex justify-content-between align-items-end mb-2">
+                <h3 class="h6 mb-0">
+                    Sana uygun ilanlar
+                    <span class="text-muted fw-normal small">
+                        (@(oneriSehir ?? "tüm şehirler")@(oneriButce.HasValue ? $" · {oneriButce.Value.ToString("N0", tr)}₺'ye kadar" : ""))
+                    </span>
+                </h3>
+                <a asp-controller="Ilan" asp-action="Index" asp-route-Sehir="@oneriSehir" asp-route-KiraMax="@oneriButce" class="small">Tümünü gör →</a>
+            </div>
+            @if (oneriIlanlar.Any())
+            {
+                <div class="kart-izgara uc">
+                    @foreach (var ilan in oneriIlanlar)
+                    {
+                        <partial name="~/Views/Ilan/_IlanKarti.cshtml" model="ilan" />
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="small text-muted">Şu an şehrinde ve bütçene uygun ilan yok. <a asp-controller="Ilan" asp-action="Index" asp-route-Sehir="@oneriSehir" asp-route-KiraMax="@oneriButce">Aramayı kaydedersen</a> yeni ilan gelince haber veririz.</p>
+            }
+        }
+    </section>
+}
 
 <!-- Son ilanlar -->
 <section class="bolum pt-0">

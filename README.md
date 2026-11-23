@@ -10,12 +10,7 @@ Gerekenler:
 
 Adımlar:
 1. Visual Studio → **Clone a repository** → `https://github.com/betulala/RooMee`
-2. **Tools → NuGet Package Manager → Package Manager Console** açıp çalıştır:
-   ```
-   Update-Database
-   ```
-   Bu, bilgisayarındaki LocalDB'de veritabanını oluşturur. Herkesin veritabanı kendi bilgisayarındadır, veriler paylaşılmaz.
-3. **F5** ile çalıştır.
+2. **F5** ile çalıştır. Uygulama açılırken veritabanını (LocalDB) kendisi oluşturur ve bekleyen tüm veritabanı değişikliklerini (migration) otomatik uygular; `Update-Database` çalıştırmana gerek yoktur. Herkesin veritabanı kendi bilgisayarındadır, veriler paylaşılmaz.
 
 ### Test verisi (isteğe bağlı)
 
@@ -66,6 +61,14 @@ Visual Studio çakışan dosyaları gösterir. **Merge** ekranında iki tarafı 
 - İlan filtreleme ve sayfalama, İlanlarım sayfası
 - Favoriler, mesajlaşma
 - Şikayet sistemi (ilan / kullanıcı bildirme) ve yönetici inceleme sayfası
+- E-posta bildirimleri (yeni mesaj, şikayet sonucu kaldırılan ilan); profilden kapatılabilir
+- Kayıtlı aramalar: uyan yeni ilan eklenince e-posta uyarısı
+- Ev arkadaşı değerlendirmesi (karşılıklı mesajlaşanlar 1-5 yıldız ve yorum bırakabilir)
+- Sayfa yenilemeden mesajlaşma (yeni mesajlar ve okundu bilgisi kendiliğinden gelir)
+- Ana sayfada giriş yapan kişiye uyumlu ev arkadaşı ve ilan önerileri
+- İlanlar için harita görünümü (Leaflet + OpenStreetMap, şehir bazında)
+
+> Not: `.test` uzantılı e-posta adreslerine (test hesapları) e-posta gönderilmez; SMTP ayarı yapılmamışsa e-postalar sadece günlüğe yazılır.
 - Hakkımızda ve KVKK aydınlatma metni
 - Ev Arkadaşları: profil listesi, gelişmiş filtreler ve uyum yüzdesi
   (tasarım ve filtre mantığı ToplumaHizmetVatanaHizmettir reposundaki `kullanicilar.html` prototipinden uyarlandı)

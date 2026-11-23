@@ -83,6 +83,9 @@ public class ProfilDuzenleViewModel
     [Display(Name = "Hobiler")]
     public List<string> Hobiler { get; set; } = new();
 
+    [Display(Name = "E-posta bildirimleri (yeni mesaj, kayıtlı arama uyarısı)")]
+    public bool EpostaBildirim { get; set; } = true;
+
     [Display(Name = "Profil fotoğrafı")]
     public IFormFile? Foto { get; set; }
 
@@ -207,6 +210,15 @@ public class KullaniciKartViewModel
     public ApplicationUser Kullanici { get; set; } = null!;
     public Profil Profil => Kullanici.Profil!;
     public int? Uyum { get; set; }
+    public double? Puan { get; set; }
+    public int PuanSayisi { get; set; }
+}
+
+public class KayitliAramaOzetViewModel
+{
+    public KayitliArama Arama { get; set; } = null!;
+    public int Toplam { get; set; }
+    public int Yeni { get; set; }
 }
 
 public class SikayetFormViewModel
@@ -242,20 +254,24 @@ public class KonusmaOzetViewModel
     public int Okunmamis { get; set; }
 }
 
-public class IlanAramaViewModel
+// Filtreler (Sehir, KiraMax ...) IlanAramaKriteri'nden gelir: /Ilan?Sehir=Konya&KiraMax=6000 ...
+public class HaritaNoktasi
 {
-    // Filtreler (adres çubuğundan gelir: /Ilan?Sehir=Konya&KiraMax=6000 ...)
-    public string? Sehir { get; set; }
-    public string? Ilce { get; set; }
-    public int? KiraMin { get; set; }
-    public int? KiraMax { get; set; }
-    public OdaTipi? OdaTipi { get; set; }
-    public bool SadeceOgrenci { get; set; }
-    public bool SigaraIcmeyen { get; set; }
-    public bool Sessiz { get; set; }
-    public bool EvcilHayvanKabul { get; set; }
-    public bool SadeceDogrulanmis { get; set; }
+    public string Sehir { get; set; } = "";
+    public double Enlem { get; set; }
+    public double Boylam { get; set; }
+    public int Sayi { get; set; }
+    public List<HaritaIlani> Ilanlar { get; set; } = new();
+}
+
+public record HaritaIlani(int Id, string Baslik, string Ilce, int Kira);
+
+public class IlanAramaViewModel : RooMee.Services.IlanAramaKriteri
+{
     public string? Siralama { get; set; }
+    public string? Gorunum { get; set; }                       // "harita" ya da boş (liste)
+    public List<HaritaNoktasi> HaritaNoktalari { get; set; } = new();
+    public int HaritadaGosterilemeyen { get; set; }
     public int Sayfa { get; set; } = 1;
 
     // Sonuçlar

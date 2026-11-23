@@ -204,6 +204,27 @@ a.satir-kart:hover { box-shadow: var(--ea-shadow-md); color: inherit; }
 .ea .adim-kart .ikon { width: 56px; height: 56px; border-radius: 16px; background: var(--ea-primary-light);
   display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 12px; }
 
+/* ---------- Harita ---------- */
+.harita-isareti {
+  border-radius: 50%; background: rgba(255, 122, 89, .9); color: #fff; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(31, 41, 51, .3); font-size: .95rem;
+}
+.harita-liste { padding-left: 18px; margin: 8px 0; max-height: 220px; overflow-y: auto; }
+.harita-liste li { margin-bottom: 6px; }
+
+/* ---------- Değerlendirmeler ---------- */
+.ea .yildizlar { color: #f5a623; letter-spacing: 1px; }
+.ea .yildizlar .bos { color: #d9d4cc; }
+.ea .puan-ozet { font-size: .82rem; color: var(--ea-muted); white-space: nowrap; }
+.ea .yorum { border-bottom: 1px solid var(--ea-border); padding: 12px 0; }
+.ea .yorum:last-child { border-bottom: none; }
+.ea .yildiz-sec { display: inline-flex; flex-direction: row-reverse; gap: 2px; }
+.ea .yildiz-sec input { display: none; }
+.ea .yildiz-sec label { font-size: 1.8rem; color: #d9d4cc; cursor: pointer; line-height: 1; }
+.ea .yildiz-sec input:checked ~ label,
+.ea .yildiz-sec label:hover, .ea .yildiz-sec label:hover ~ label { color: #f5a623; }
+
 /* ---------- Hakkımızda ---------- */
 .ea .bolum { padding: 36px 0; }
 .ea .bolum.yuzey { background: var(--ea-surface); border-radius: var(--ea-radius-md); padding: 36px 24px; }

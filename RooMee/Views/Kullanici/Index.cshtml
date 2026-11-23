@@ -213,27 +213,7 @@
                 <div class="kart-izgara">
                     @foreach (var k in Model.Sonuclar)
                     {
-                        var p = k.Profil;
-                        var ne = p.Ogrenci && !string.IsNullOrEmpty(p.Bolum) ? p.Bolum : p.Meslek ?? p.Bolum;
-                        <a class="kisi-karti" asp-controller="Profil" asp-action="Goruntule" asp-route-id="@k.Kullanici.Id"
-                           aria-label="@k.Kullanici.KisaAd profilini görüntüle">
-                            <div class="kart-ust">
-                                <partial name="_Avatar" model="k.Kullanici" />
-                                <div class="bilgi">
-                                    <h2>@k.Kullanici.KisaAd</h2>
-                                    <span>@(string.IsNullOrEmpty(ne) ? "" : ne + " · ")@p.Sehir!.ToUpper(tr)</span>
-                                </div>
-                                @if (k.Uyum.HasValue)
-                                {
-                                    <span class="uyum">%@k.Uyum uyum</span>
-                                }
-                            </div>
-                            <partial name="_Etiketler" model="k.Kullanici" />
-                            <div class="kart-alt">
-                                <div class="fiyat">@Tl(p.Butce)@if (p.Butce.HasValue) {<span> / ay</span>}</div>
-                                <span class="ea-btn ea-btn-sade ea-btn-kucuk">Detay Gör</span>
-                            </div>
-                        </a>
+                        <partial name="_KisiKarti" model="k" />
                     }
                 </div>
 

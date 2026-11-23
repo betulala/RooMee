@@ -2,8 +2,18 @@
 @{
     ViewData["Title"] = "İlanlar";
     bool kriterVar = Model.SadeceOgrenci || Model.SigaraIcmeyen || Model.Sessiz || Model.EvcilHayvanKabul || Model.SadeceDogrulanmis;
+    bool harita = Model.Gorunum == "harita";
 }
 @functions {
+    // Liste/Harita geçişinde filtreleri koruyarak adres üretir
+    string GorunumAdresi(string? gorunum)
+    {
+        var d = Context.Request.Query.Where(k => k.Key != "Gorunum" && k.Key != "Sayfa")
+            .ToDictionary(k => k.Key, v => v.Value.ToString());
+        if (gorunum != null) d["Gorunum"] = gorunum;
+        return Url.Action("Index", d)!;
+    }
+
     // Sayfa bağlantılarında mevcut filtreleri korur
     Dictionary<string, string> Rota(int sayfa)
     {
@@ -83,6 +93,7 @@
             </details>
 
             <input type="hidden" name="Siralama" id="f-siralama-gizli" value="@Model.Siralama" />
+            <input type="hidden" name="Gorunum" value="@Model.Gorunum" />
 
             <div class="filtre-butonlar">
                 <button type="submit" class="ea-btn ea-btn-ana">🔍 Uygula</button>
@@ -95,6 +106,10 @@
     <section aria-label="Sonuçlar">
         <div class="sonuc-ust">
             <p aria-live="polite"><strong>@Model.ToplamSayi</strong> ilan bulundu</p>
+            <div class="btn-group ms-auto" role="group" aria-label="Görünüm">
+                <a class="btn btn-sm @(harita ? "btn-outline-secondary" : "btn-success")" href="@GorunumAdresi(null)">☰ Liste</a>
+                <a class="btn btn-sm @(harita ? "btn-success" : "btn-outline-secondary")" href="@GorunumAdresi("harita")">🗺 Harita</a>
+            </div>
             <label class="visually-hidden" for="f-sirala">Sırala</label>
             <select id="f-sirala" class="siralama">
                 <option value="" selected="@string.IsNullOrEmpty(Model.Siralama)">En yeni</option>
@@ -104,6 +119,44 @@
             </select>
         </div>
 
+        @if (!Model.BosMu)
+        {
+            <div class="form-kart p-3 mb-3 d-flex flex-wrap align-items-center gap-2">
+                <span class="small text-muted flex-grow-1">
+                    <strong>@Model.Ozet()</strong><br />
+                    Bu aramaya uyan yeni ilan eklenince e-posta ile haber almak ister misin?
+                </span>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="KayitliArama" asp-action="Kaydet" method="post" class="d-inline">
+                        @foreach (var kv in Model.RotaDegerleri())
+                        {
+                            <input type="hidden" name="@kv.Key" value="@kv.Value" />
+                        }
+                        <button type="submit" class="btn btn-sm btn-primary">🔔 Bu aramayı kaydet</button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)"
+                       class="btn btn-sm btn-outline-primary">Aramayı kaydetmek için giriş yap</a>
+                }
+            </div>
+        }
+
+        @if (harita)
+        {
+            <div id="ilan-haritasi" class="form-kart p-0 overflow-hidden" style="height:560px" aria-label="İlan haritası"></div>
+            <p class="small text-muted mt-2">
+                İlanlar gizlilik için tam adresle değil, şehir merkezinde gruplanarak gösterilir. Daireye tıklayınca o şehrin ilanları açılır.
+                @if (Model.HaritadaGosterilemeyen > 0)
+                {
+                    <span>@Model.HaritadaGosterilemeyen ilanın şehri tanınamadığı için haritada yok.</span>
+                }
+            </p>
+        }
+        else
+        {
         @if (!Model.Sonuclar.Any())
         {
             <div class="bos-durum">
@@ -141,10 +194,58 @@
                 </ul>
             </nav>
         }
+        }
     </section>
 </div>
 
+@section Styles {
+    @if (harita)
+    {
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    }
+}
+
 @section Scripts {
+    @if (harita)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+        <script>
+            (function () {
+                const noktalar = @Json.Serialize(Model.HaritaNoktalari);
+                const detayAdresi = '@Url.Action("Detay", new { id = 0 })'.replace(/0$/, '');
+                const sehirAdresi = s => '@Url.Action("Index")?Sehir=' + encodeURIComponent(s);
+                const tl = n => n.toLocaleString('tr-TR') + '₺';
+                const kacis = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+                const harita = L.map('ilan-haritasi', { scrollWheelZoom: false }).setView([39.0, 35.2], 6);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıcıları'
+                }).addTo(harita);
+
+                const sinirlar = [];
+                for (const n of noktalar) {
+                    const yaricap = Math.min(14 + n.sayi * 3, 40);
+                    const ikon = L.divIcon({
+                        className: '',
+                        html: `<div class="harita-isareti" style="width:${yaricap * 2}px;height:${yaricap * 2}px">${n.sayi}</div>`,
+                        iconSize: [yaricap * 2, yaricap * 2],
+                        iconAnchor: [yaricap, yaricap]
+                    });
+                    const liste = n.ilanlar.map(i =>
+                        `<li><a href="${detayAdresi}${i.id}">${kacis(i.baslik)}</a><br><small>${kacis(i.ilce)} · ${tl(i.kira)}</small></li>`).join('');
+                    const fazlasi = n.sayi > n.ilanlar.length ? `<li><small>+${n.sayi - n.ilanlar.length} ilan daha</small></li>` : '';
+                    L.marker([n.enlem, n.boylam], { icon: ikon, title: `${n.sehir}: ${n.sayi} ilan` })
+                        .addTo(harita)
+                        .bindPopup(`<strong>${kacis(n.sehir)}</strong> · ${n.sayi} ilan<ul class="harita-liste">${liste}${fazlasi}</ul>
+                                    <a href="${sehirAdresi(n.sehir)}">Bu şehirdeki ilanları listele →</a>`);
+                    sinirlar.push([n.enlem, n.boylam]);
+                }
+                if (sinirlar.length === 1) harita.setView(sinirlar[0], 10);
+                else if (sinirlar.length > 1) harita.fitBounds(sinirlar, { padding: [40, 40] });
+            })();
+        </script>
+    }
     <script>
         // Sıralama değişince filtrelerle birlikte hemen uygula
         document.getElementById('f-sirala').addEventListener('change', function () {

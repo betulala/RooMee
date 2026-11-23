@@ -17,11 +17,15 @@ public class IlanController : Controller
     private const long MaxFotoBoyutu = 3 * 1024 * 1024; // 3 MB
     private const int MaxFotoSayisi = 5;
 
-    public IlanController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
+    private readonly RooMee.Services.AramaUyarilari _aramaUyarilari;
+
+    public IlanController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, IWebHostEnvironment env,
+        RooMee.Services.AramaUyarilari aramaUyarilari)
     {
         _db = db;
         _userManager = userManager;
         _env = env;
+        _aramaUyarilari = aramaUyarilari;
     }
 
     // Tüm yayındaki ilanlar (giriş yapmadan da görülebilir)
@@ -30,38 +34,7 @@ public class IlanController : Controller
     {
         const int SayfaBoyutu = 12;
 
-        var q = _db.Ilanlar.Where(i => i.Aktif);
-
-        if (!string.IsNullOrWhiteSpace(f.Sehir))
-        {
-            var sehir = f.Sehir.Trim();
-            q = q.Where(i => i.Sehir.Contains(sehir));
-        }
-        if (!string.IsNullOrWhiteSpace(f.Ilce))
-        {
-            var ilce = f.Ilce.Trim();
-            q = q.Where(i => i.Ilce.Contains(ilce));
-        }
-        if (f.KiraMin.HasValue)
-        {
-            var min = f.KiraMin.Value;
-            q = q.Where(i => i.Kira >= min);
-        }
-        if (f.KiraMax.HasValue)
-        {
-            var max = f.KiraMax.Value;
-            q = q.Where(i => i.Kira <= max);
-        }
-        if (f.OdaTipi.HasValue)
-        {
-            var tip = f.OdaTipi.Value;
-            q = q.Where(i => i.OdaTipi == tip);
-        }
-        if (f.SadeceOgrenci) q = q.Where(i => i.SadeceOgrenci);
-        if (f.SigaraIcmeyen) q = q.Where(i => i.SigaraIcmeyen);
-        if (f.Sessiz) q = q.Where(i => i.Sessiz);
-        if (f.EvcilHayvanKabul) q = q.Where(i => i.EvcilHayvanKabul);
-        if (f.SadeceDogrulanmis) q = q.Where(i => i.Kullanici!.OgrenciDogrulandi);
+        var q = RooMee.Services.IlanFiltresi.Uygula(_db.Ilanlar.Where(i => i.Aktif), f);
 
         q = f.Siralama switch
         {
@@ -81,6 +54,28 @@ public class IlanController : Controller
             .Skip((f.Sayfa - 1) * SayfaBoyutu)
             .Take(SayfaBoyutu)
             .ToListAsync();
+
+        // Harita görünümü: filtreye uyan tüm ilanlar şehir merkezinde gruplanır
+        if (f.Gorunum == "harita")
+        {
+            var hepsi = await q
+                .Select(i => new { i.Id, i.Baslik, i.Sehir, i.Ilce, i.Kira })
+                .Take(1000)
+                .ToListAsync();
+            foreach (var grup in hepsi.GroupBy(i => i.Sehir.Trim().ToUpper(new System.Globalization.CultureInfo("tr-TR"))))
+            {
+                var konum = RooMee.Services.SehirKonumlari.Bul(grup.Key);
+                if (konum == null) { f.HaritadaGosterilemeyen += grup.Count(); continue; }
+                f.HaritaNoktalari.Add(new HaritaNoktasi
+                {
+                    Sehir = grup.First().Sehir.Trim(),
+                    Enlem = konum.Value.Enlem,
+                    Boylam = konum.Value.Boylam,
+                    Sayi = grup.Count(),
+                    Ilanlar = grup.Take(8).Select(i => new HaritaIlani(i.Id, i.Baslik, i.Ilce, i.Kira)).ToList()
+                });
+            }
+        }
 
         // Şehir kutusunda öneri olarak çıkacak şehirler
         f.Sehirler = await _db.Ilanlar
@@ -149,6 +144,11 @@ public class IlanController : Controller
         _db.Ilanlar.Add(ilan);
         await FotolariKaydet(vm, ilan);
         await _db.SaveChangesAsync();
+
+        // Bu ilana uyan kayıtlı araması olanlara e-posta ile haber ver
+        await _aramaUyarilari.YeniIlanIcinAsync(ilan.Id,
+            i => Url.Action(nameof(Detay), "Ilan", new { id = i.Id }, Request.Scheme)!,
+            a => Url.Action("Ac", "KayitliArama", new { id = a.Id }, Request.Scheme)!);
 
         TempData["Mesaj"] = "İlanın yayınlandı.";
         return RedirectToAction(nameof(Detay), new { id = ilan.Id });

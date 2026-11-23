@@ -12,11 +12,13 @@ public class SikayetController : Controller
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RooMee.Services.Bildirimci _bildirimci;
 
-    public SikayetController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+    public SikayetController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RooMee.Services.Bildirimci bildirimci)
     {
         _db = db;
         _userManager = userManager;
+        _bildirimci = bildirimci;
     }
 
     private string BenimId => _userManager.GetUserId(User)!;
@@ -136,7 +138,7 @@ public class SikayetController : Controller
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = Roller.Yonetici)]
     public async Task<IActionResult> Karar(int id, SikayetDurumu durum, bool ilaniKaldir)
     {
-        var s = await _db.Sikayetler.Include(x => x.Ilan).FirstOrDefaultAsync(x => x.Id == id);
+        var s = await _db.Sikayetler.Include(x => x.Ilan).ThenInclude(i => i!.Kullanici).FirstOrDefaultAsync(x => x.Id == id);
         if (s == null) return NotFound();
 
         var eskiDurum = s.Durum;
@@ -145,7 +147,11 @@ public class SikayetController : Controller
         if (ilaniKaldir && s.Ilan != null && s.Ilan.Aktif)
         {
             s.Ilan.Aktif = false;
-            TempData["Mesaj"] = $"Şikayet kapatıldı ve \"{s.Ilan.Baslik}\" ilanı yayından kaldırıldı.";
+            TempData["Mesaj"] = $"Şikayet kapatıldı ve \"{s.Ilan.Baslik}\" ilanı yayından kaldırıldı. İlan sahibine e-posta ile bildirildi.";
+            await _db.SaveChangesAsync();
+            if (s.Ilan.Kullanici != null)
+                await _bildirimci.IlanKaldirildiAsync(s.Ilan.Kullanici, s.Ilan.Baslik, s.Neden);
+            return RedirectToAction(nameof(Yonetim), new { durum = eskiDurum });
         }
         else
         {

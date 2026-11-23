@@ -19,6 +19,9 @@ public class ApplicationUser : IdentityUser
     public string? OgrenciEposta { get; set; }
     public bool OgrenciDogrulandi { get; set; }
     public DateTime? OgrenciDogrulamaTarihi { get; set; }
+    // Yeni mesaj, kayıtlı arama uyarısı gibi e-posta bildirimleri
+    public bool EpostaBildirim { get; set; } = true;
+
     [NotMapped]
     public string KisaAd => string.IsNullOrEmpty(Soyad) ? Ad : $"{Ad} {Soyad[0]}.";
 

@@ -49,7 +49,17 @@ public class ProfilController : Controller
         {
             var benimProfil = await _db.Profiller.FirstOrDefaultAsync(p => p.KullaniciId == benimId);
             ViewBag.Uyum = RooMee.Services.Uyum.Hesapla(benimProfil, kullanici.Profil);
+            ViewBag.Degerlendirebilir = await DegerlendirmeController.DegerlendirebilirMi(_db, benimId, kullanici.Id);
         }
+
+        // Bu kişi hakkındaki değerlendirmeler
+        var degerlendirmeler = await _db.Degerlendirmeler
+            .Where(d => d.HakkindaId == kullanici.Id)
+            .Include(d => d.Yazan)
+            .OrderByDescending(d => d.Tarih)
+            .ToListAsync();
+        ViewBag.Degerlendirmeler = degerlendirmeler;
+        ViewBag.BenimDegerlendirmem = degerlendirmeler.FirstOrDefault(d => d.YazanId == benimId);
         return View(kullanici);
     }
 
@@ -87,6 +97,7 @@ public class ProfilController : Controller
             CalismaDuzeni = p.CalismaDuzeni,
             EvcilHayvan = p.EvcilHayvan,
             Hobiler = p.HobiListesi,
+            EpostaBildirim = k.EpostaBildirim,
             MevcutFotoYolu = p.FotoYolu
         });
     }
@@ -134,6 +145,7 @@ public class ProfilController : Controller
             p.FotoYolu = $"/uploads/profil/{dosyaAdi}";
         }
 
+        k.EpostaBildirim = vm.EpostaBildirim;
         k.Ad = vm.Ad.Trim();
         k.Soyad = vm.Soyad.Trim();
         p.Universite = vm.Universite?.Trim();
@@ -277,6 +289,9 @@ public class ProfilController : Controller
         await _db.Favoriler.Where(f => f.KullaniciId == k.Id).ExecuteDeleteAsync();
         await _db.Sikayetler
             .Where(s => s.SikayetEdenId == k.Id || s.SikayetEdilenKullaniciId == k.Id)
+            .ExecuteDeleteAsync();
+        await _db.Degerlendirmeler
+            .Where(d => d.YazanId == k.Id || d.HakkindaId == k.Id)
             .ExecuteDeleteAsync();
         // Konuşmaları sil (mesajlar zincirleme silinir)
         await _db.Konusmalar

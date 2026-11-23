@@ -1,0 +1,6 @@
+@model double
+@{
+    // 4.3 -> ★★★★☆ (yarım yıldız yok, en yakına yuvarlanır)
+    var dolu = (int)Math.Round(Model, MidpointRounding.AwayFromZero);
+}
+<span class="yildizlar" aria-label="5 üzerinden @Model.ToString("0.#") yıldız">@(new string('★', dolu))<span class="bos">@(new string('★', 5 - dolu))</span></span>

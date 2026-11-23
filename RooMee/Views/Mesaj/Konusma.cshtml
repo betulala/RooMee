@@ -43,37 +43,23 @@
             <div id="mesajlar" class="card-body bg-light" style="height:60vh;overflow-y:auto">
                 @if (!Model.Mesajlar.Any())
                 {
-                    <p class="text-center text-muted small my-5">Henüz mesaj yok. İlk mesajı sen gönder!</p>
+                    <p id="bos-mesaj" class="text-center text-muted small my-5">Henüz mesaj yok. İlk mesajı sen gönder!</p>
                 }
                 @foreach (var m in Model.Mesajlar)
                 {
                     var yerel = m.Tarih.ToLocalTime();
-                    bool benim = m.GonderenId == benimId;
-
                     if (oncekiGun != yerel.Date)
                     {
                         oncekiGun = yerel.Date;
-                        <div class="text-center my-2"><span class="badge text-bg-secondary fw-normal">@GunBasligi(yerel.Date)</span></div>
+                        <div class="text-center my-2" data-gun-basligi="@yerel.ToString("yyyy-MM-dd")"><span class="badge text-bg-secondary fw-normal">@GunBasligi(yerel.Date)</span></div>
                     }
-
-                    <div class="d-flex mb-2 @(benim ? "justify-content-end" : "justify-content-start")">
-                        <div class="px-3 py-2 rounded-3 shadow-sm @(benim ? "bg-primary text-white" : "bg-white")" style="max-width:75%">
-                            <div style="white-space:pre-line;word-break:break-word">@m.Metin</div>
-                            <div class="small text-end @(benim ? "text-white-50" : "text-muted")" style="font-size:.75rem">
-                                @yerel.ToString("HH:mm")
-                                @if (benim)
-                                {
-                                    <span title="@(m.Okundu ? "Okundu" : "Gönderildi")">@(m.Okundu ? "✓✓" : "✓")</span>
-                                }
-                            </div>
-                        </div>
-                    </div>
+                    <partial name="_MesajBalonu" model="m" view-data='new ViewDataDictionary(ViewData) { ["BenimId"] = benimId }' />
                 }
             </div>
 
             <!-- Gönderme kutusu -->
             <div class="card-footer bg-white">
-                <form asp-action="Gonder" method="post" class="d-flex gap-2">
+                <form asp-action="Gonder" method="post" class="d-flex gap-2" id="gonder-form">
                     <input type="hidden" name="konusmaId" value="@Model.Id" />
                     <textarea name="metin" id="metin" class="form-control" rows="1" maxlength="1000" required
                               placeholder="Mesaj yaz..." style="resize:none"></textarea>
@@ -100,5 +86,80 @@
                 if (metin.value.trim()) metin.form.requestSubmit();
             }
         });
+
+        // ---- Sayfayı yenilemeden mesajlaşma ----
+        const konusmaId = @Model.Id;
+        const yenilerAdresi = '@Url.Action("Yeniler", new { konusmaId = Model.Id })';
+        const form = document.getElementById('gonder-form');
+        let bekliyor = false;
+
+        const sonId = () => {
+            const balonlar = kutu.querySelectorAll('[data-mesaj-id]');
+            return balonlar.length ? Number(balonlar[balonlar.length - 1].dataset.mesajId) : 0;
+        };
+        const enAltta = () => kutu.scrollHeight - kutu.scrollTop - kutu.clientHeight < 80;
+
+        async function yenile() {
+            if (bekliyor) return;
+            bekliyor = true;
+            try {
+                const cevap = await fetch(`${yenilerAdresi}&sonId=${sonId()}`, { headers: { 'X-Requested-With': 'fetch' } });
+                if (!cevap.ok) return;
+                const veri = {
+                    html: (await cevap.text()).trim(),
+                    okunanlar: (cevap.headers.get('X-Okunanlar') || '').split(',').filter(Boolean)
+                };
+                const alttaydi = enAltta();
+
+                if (veri.html) {
+                    document.getElementById('bos-mesaj')?.remove();
+                    const gecici = document.createElement('div');
+                    gecici.innerHTML = veri.html;
+                    for (const balon of [...gecici.children]) {
+                        // Aynı mesaj iki kez eklenmesin
+                        if (kutu.querySelector(`[data-mesaj-id="${balon.dataset.mesajId}"]`)) continue;
+                        // Yeni güne geçildiyse "Bugün" başlığı ekle
+                        const gun = balon.dataset.gun;
+                        if (gun && !kutu.querySelector(`[data-gun-basligi="${gun}"]`)) {
+                            const baslik = document.createElement('div');
+                            baslik.className = 'text-center my-2';
+                            baslik.dataset.gunBasligi = gun;
+                            baslik.innerHTML = '<span class="badge text-bg-secondary fw-normal">Bugün</span>';
+                            kutu.appendChild(baslik);
+                        }
+                        kutu.appendChild(balon);
+                    }
+                    if (alttaydi) kutu.scrollTop = kutu.scrollHeight;
+                }
+                // Karşı tarafın okuduğu mesajlarımı ✓✓ yap
+                for (const id of veri.okunanlar || []) {
+                    const isaret = kutu.querySelector(`[data-mesaj-id="${id}"] .okundu-isareti`);
+                    if (isaret) { isaret.textContent = '✓✓'; isaret.title = 'Okundu'; }
+                }
+            } catch { /* bağlantı koptuysa bir sonraki denemede tekrar dener */ }
+            finally { bekliyor = false; }
+        }
+
+        // Gönder: sayfa yenilenmeden gönder, sonra yeni mesajları çek
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const yazi = metin.value.trim();
+            if (!yazi) return;
+            const veri = new FormData(form);
+            metin.value = '';
+            metin.focus();
+            try {
+                await fetch(form.action, { method: 'POST', body: veri });
+            } catch {
+                metin.value = yazi; // gönderilemediyse yazıyı geri koy
+                return;
+            }
+            await yenile();
+            kutu.scrollTop = kutu.scrollHeight;
+        });
+
+        // Sekme açıkken 4 saniyede bir yeni mesaj var mı bak
+        setInterval(() => { if (!document.hidden) yenile(); }, 4000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) yenile(); });
     </script>
 }

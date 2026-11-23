@@ -183,6 +183,9 @@ namespace RooMee.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("EpostaBildirim")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("KayitTarihi")
                         .HasColumnType("datetime2");
 
@@ -248,6 +251,42 @@ namespace RooMee.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("RooMee.Models.Degerlendirme", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HakkindaId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Puan")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Tarih")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("YazanId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Yorum")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HakkindaId");
+
+                    b.HasIndex("YazanId", "HakkindaId")
+                        .IsUnique();
+
+                    b.ToTable("Degerlendirmeler");
                 });
 
             modelBuilder.Entity("RooMee.Models.Favori", b =>
@@ -360,6 +399,44 @@ namespace RooMee.Data.Migrations
                     b.HasIndex("IlanId");
 
                     b.ToTable("IlanFotolari");
+                });
+
+            modelBuilder.Entity("RooMee.Models.KayitliArama", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Ad")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<bool>("EpostaUyarisi")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("KriterJson")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("KullaniciId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("OlusturmaTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SonBakis")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KullaniciId");
+
+                    b.ToTable("KayitliAramalar");
                 });
 
             modelBuilder.Entity("RooMee.Models.Konusma", b =>
@@ -636,6 +713,25 @@ namespace RooMee.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RooMee.Models.Degerlendirme", b =>
+                {
+                    b.HasOne("RooMee.Models.ApplicationUser", "Hakkinda")
+                        .WithMany()
+                        .HasForeignKey("HakkindaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RooMee.Models.ApplicationUser", "Yazan")
+                        .WithMany()
+                        .HasForeignKey("YazanId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Hakkinda");
+
+                    b.Navigation("Yazan");
+                });
+
             modelBuilder.Entity("RooMee.Models.Favori", b =>
                 {
                     b.HasOne("RooMee.Models.Ilan", "Ilan")
@@ -675,6 +771,17 @@ namespace RooMee.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Ilan");
+                });
+
+            modelBuilder.Entity("RooMee.Models.KayitliArama", b =>
+                {
+                    b.HasOne("RooMee.Models.ApplicationUser", "Kullanici")
+                        .WithMany()
+                        .HasForeignKey("KullaniciId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Kullanici");
                 });
 
             modelBuilder.Entity("RooMee.Models.Konusma", b =>

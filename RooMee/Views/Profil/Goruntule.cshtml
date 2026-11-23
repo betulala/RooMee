@@ -4,6 +4,9 @@
     var p = Model.Profil;
     bool kendi = ViewBag.KendiProfili == true;
     var uyum = ViewBag.Uyum as RooMee.Services.UyumSonucu;
+    var degerlendirmeler = ViewBag.Degerlendirmeler as List<Degerlendirme> ?? new();
+    var benimki = ViewBag.BenimDegerlendirmem as Degerlendirme;
+    bool degerlendirebilir = ViewBag.Degerlendirebilir == true;
     var tr = new System.Globalization.CultureInfo("tr-TR");
 }
 @functions {
@@ -162,6 +165,70 @@
                     </div>
                 }
             }
+
+            <!-- Değerlendirmeler -->
+            <div class="card shadow-sm mb-3" id="degerlendirmeler">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                        <h2 class="h6 mb-0">Değerlendirmeler</h2>
+                        @if (degerlendirmeler.Any())
+                        {
+                            <span>
+                                <partial name="~/Views/Kullanici/_Yildizlar.cshtml" model="degerlendirmeler.Average(d => d.Puan)" />
+                                <span class="puan-ozet">@degerlendirmeler.Average(d => d.Puan).ToString("0.0", tr) · @degerlendirmeler.Count değerlendirme</span>
+                            </span>
+                        }
+                    </div>
+
+                    @if (!degerlendirmeler.Any())
+                    {
+                        <p class="small text-muted mb-0">Henüz değerlendirme yok.</p>
+                    }
+                    @foreach (var d in degerlendirmeler)
+                    {
+                        <div class="yorum">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-semibold small">@d.Yazan?.KisaAd</span>
+                                <small class="text-muted">@d.Tarih.ToLocalTime().ToString("d MMMM yyyy", tr)</small>
+                            </div>
+                            <partial name="~/Views/Kullanici/_Yildizlar.cshtml" model="(double)d.Puan" />
+                            @if (!string.IsNullOrWhiteSpace(d.Yorum))
+                            {
+                                <p class="small mb-0 mt-1" style="white-space:pre-line">@d.Yorum</p>
+                            }
+                        </div>
+                    }
+
+                    @if (degerlendirebilir)
+                    {
+                        <form asp-controller="Degerlendirme" asp-action="Kaydet" method="post" class="mt-3 pt-3 border-top">
+                            <input type="hidden" name="hakkindaId" value="@Model.Id" />
+                            <div class="small fw-semibold mb-1">@(benimki == null ? "Değerlendir" : "Değerlendirmeni güncelle")</div>
+                            <div class="yildiz-sec mb-2" role="radiogroup" aria-label="Puan">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" name="puan" id="puan-@i" value="@i" checked="@(benimki?.Puan == i)" required />
+                                    <label for="puan-@i" title="@i yıldız">★</label>
+                                }
+                            </div>
+                            <textarea name="yorum" class="form-control mb-2" rows="2" maxlength="500"
+                                      placeholder="Ev arkadaşı olarak nasıldı? (isteğe bağlı)">@benimki?.Yorum</textarea>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-primary">Kaydet</button>
+                                @if (benimki != null)
+                                {
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            formaction="@Url.Action("Sil", "Degerlendirme", new { hakkindaId = Model.Id })" formnovalidate>Sil</button>
+                                }
+                            </div>
+                        </form>
+                    }
+                    else if (!kendi && User.Identity?.IsAuthenticated == true)
+                    {
+                        <p class="small text-muted mt-3 mb-0">Karşılıklı mesajlaştığın kişileri değerlendirebilirsin.</p>
+                    }
+                </div>
+            </div>
         </div>
 
         <!-- Sağ: uyum ve hesap -->

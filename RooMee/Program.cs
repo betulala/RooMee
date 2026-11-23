@@ -39,6 +39,8 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = turkce;
 
 builder.Services.Configure<RooMee.Services.EpostaAyarlari>(builder.Configuration.GetSection("Eposta"));
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, RooMee.Services.SmtpEpostaGonderici>();
+builder.Services.AddScoped<RooMee.Services.Bildirimci>();
+builder.Services.AddScoped<RooMee.Services.AramaUyarilari>();
 var app = builder.Build();
 
 // Geliştirme için örnek veri: dotnet run --project RooMee -- --test-verisi
@@ -75,6 +77,8 @@ try
 {
     using var kapsam = app.Services.CreateScope();
     var db = kapsam.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // Bekleyen veritabanı değişikliklerini (migration) otomatik uygula; Update-Database'e gerek kalmaz
+    await db.Database.MigrateAsync();
     await db.Users.Where(u => u.TwoFactorEnabled).ExecuteUpdateAsync(s => s.SetProperty(u => u.TwoFactorEnabled, false));
 }
 catch (Exception ex)

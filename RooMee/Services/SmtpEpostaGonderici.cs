@@ -28,6 +28,14 @@ public class SmtpEpostaGonderici : IEmailSender
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
+        // Test hesapları (@roomee.test gibi .test uzantılı adresler) gerçek değildir, e-posta gönderilmez.
+        // SMTP ayarı yapılmamışsa da e-posta sadece günlüğe yazılır.
+        if (email.EndsWith(".test", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(_ayar.Sunucu))
+        {
+            _log.LogInformation("E-posta gönderilmedi (test adresi ya da SMTP ayarı yok): {Alici} - {Konu}", email, subject);
+            return;
+        }
+
         using var mesaj = new MailMessage
         {
             From = new MailAddress(_ayar.GonderenEposta, _ayar.GonderenAd),

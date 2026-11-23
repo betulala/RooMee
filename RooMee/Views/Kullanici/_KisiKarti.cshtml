@@ -1,0 +1,33 @@
+@model KullaniciKartViewModel
+@{
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    var p = Model.Profil;
+    var ne = p.Ogrenci && !string.IsNullOrEmpty(p.Bolum) ? p.Bolum : p.Meslek ?? p.Bolum;
+}
+<a class="kisi-karti" asp-controller="Profil" asp-action="Goruntule" asp-route-id="@Model.Kullanici.Id"
+   aria-label="@Model.Kullanici.KisaAd profilini görüntüle">
+    <div class="kart-ust">
+        <partial name="~/Views/Kullanici/_Avatar.cshtml" model="Model.Kullanici" />
+        <div class="bilgi">
+            <h2>
+                @Model.Kullanici.KisaAd
+                @if (Model.Puan.HasValue)
+                {
+                    <span class="puan-ozet ms-1"><span class="yildizlar">★</span> @Model.Puan.Value.ToString("0.0", tr) (@Model.PuanSayisi)</span>
+                }
+            </h2>
+            <span>@(string.IsNullOrEmpty(ne) ? "" : ne + " · ")@p.Sehir?.ToUpper(tr)</span>
+        </div>
+        @if (Model.Uyum.HasValue)
+        {
+            <span class="uyum">%@Model.Uyum uyum</span>
+        }
+    </div>
+    <partial name="~/Views/Kullanici/_Etiketler.cshtml" model="Model.Kullanici" />
+    <div class="kart-alt">
+        <div class="fiyat">
+            @(p.Butce.HasValue ? p.Butce.Value.ToString("N0", tr) + "₺" : "Bütçe belirtilmemiş")@if (p.Butce.HasValue) {<span> / ay</span>}
+        </div>
+        <span class="ea-btn ea-btn-sade ea-btn-kucuk">Detay Gör</span>
+    </div>
+</a>

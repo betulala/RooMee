@@ -116,6 +116,18 @@ public class KullaniciController : Controller
         f.Sayfa = Math.Clamp(f.Sayfa, 1, f.ToplamSayfa);
         f.Sonuclar = kartlar.Skip((f.Sayfa - 1) * SayfaBoyutu).Take(SayfaBoyutu).ToList();
 
+        // Bu sayfadaki kişilerin ortalama değerlendirme puanı
+        var idler = f.Sonuclar.Select(k => k.Kullanici.Id).ToList();
+        var puanlar = await _db.Degerlendirmeler
+            .Where(d => idler.Contains(d.HakkindaId))
+            .GroupBy(d => d.HakkindaId)
+            .Select(g => new { g.Key, Ort = g.Average(d => d.Puan), Sayi = g.Count() })
+            .ToDictionaryAsync(x => x.Key);
+        foreach (var k in f.Sonuclar)
+        {
+            if (puanlar.TryGetValue(k.Kullanici.Id, out var p)) { k.Puan = p.Ort; k.PuanSayisi = p.Sayi; }
+        }
+
         return View(f);
     }
 }

@@ -1,0 +1,18 @@
+@model Mesaj
+@{
+    string benimId = ViewData["BenimId"] as string ?? "";
+    var yerel = Model.Tarih.ToLocalTime();
+    bool benim = Model.GonderenId == benimId;
+}
+<div class="d-flex mb-2 @(benim ? "justify-content-end" : "justify-content-start")" data-mesaj-id="@Model.Id" data-gun="@yerel.ToString("yyyy-MM-dd")">
+    <div class="px-3 py-2 rounded-3 shadow-sm @(benim ? "text-white" : "bg-white")" style="max-width:75%;@(benim ? "background:var(--rm-primary)" : "")">
+        <div style="white-space:pre-line;word-break:break-word">@Model.Metin</div>
+        <div class="small text-end @(benim ? "text-white-50" : "text-muted")" style="font-size:.75rem">
+            @yerel.ToString("HH:mm")
+            @if (benim)
+            {
+                <span class="okundu-isareti" title="@(Model.Okundu ? "Okundu" : "Gönderildi")">@(Model.Okundu ? "✓✓" : "✓")</span>
+            }
+        </div>
+    </div>
+</div>
