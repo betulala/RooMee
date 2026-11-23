@@ -43,6 +43,13 @@ public class ProfilController : Controller
         if (kullanici == null) return NotFound();
 
         ViewBag.KendiProfili = kullanici.Id == benimId;
+
+        // Başkasının profilindeysem uyum dökümünü göster
+        if (kullanici.Id != benimId && benimId != null)
+        {
+            var benimProfil = await _db.Profiller.FirstOrDefaultAsync(p => p.KullaniciId == benimId);
+            ViewBag.Uyum = RooMee.Services.Uyum.Hesapla(benimProfil, kullanici.Profil);
+        }
         return View(kullanici);
     }
 
@@ -63,9 +70,23 @@ public class ProfilController : Controller
             YatisSaati = p.YatisSaati,
             KalkisSaati = p.KalkisSaati,
             SigaraIciyor = p.SigaraIciyor,
-            EvcilHayvanVar = p.EvcilHayvanVar,
-            SessizOrtamIster = p.SessizOrtamIster,
             Hakkinda = p.Hakkinda,
+            Cinsiyet = p.Cinsiyet,
+            DogumYili = p.DogumYili,
+            Sehir = p.Sehir,
+            Ilce = p.Ilce,
+            Ogrenci = p.Ogrenci,
+            Calisiyor = p.Calisiyor,
+            Meslek = p.Meslek,
+            Sinif = p.Sinif,
+            AramaTuru = p.AramaTuru,
+            TercihOdaTipi = p.TercihOdaTipi,
+            EvTipi = p.EvTipi,
+            BosOda = p.BosOda,
+            Uyku = p.Uyku,
+            CalismaDuzeni = p.CalismaDuzeni,
+            EvcilHayvan = p.EvcilHayvan,
+            Hobiler = p.HobiListesi,
             MevcutFotoYolu = p.FotoYolu
         });
     }
@@ -87,6 +108,9 @@ public class ProfilController : Controller
             else if (vm.Foto.Length > MaxFotoBoyutu)
                 ModelState.AddModelError(nameof(vm.Foto), "Fotoğraf en fazla 2 MB olabilir.");
         }
+
+        if (vm.AramaTuru.HasValue && string.IsNullOrWhiteSpace(vm.Sehir))
+            ModelState.AddModelError(nameof(vm.Sehir), "Ev arkadaşları listesinde görünmek için şehrini yazmalısın.");
 
         if (!ModelState.IsValid) return View(vm);
 
@@ -119,9 +143,24 @@ public class ProfilController : Controller
         p.YatisSaati = vm.YatisSaati;
         p.KalkisSaati = vm.KalkisSaati;
         p.SigaraIciyor = vm.SigaraIciyor;
-        p.EvcilHayvanVar = vm.EvcilHayvanVar;
-        p.SessizOrtamIster = vm.SessizOrtamIster;
         p.Hakkinda = vm.Hakkinda?.Trim();
+        p.Cinsiyet = vm.Cinsiyet;
+        p.DogumYili = vm.DogumYili;
+        p.Sehir = BosIseNull(vm.Sehir);
+        p.Ilce = BosIseNull(vm.Ilce);
+        p.Ogrenci = vm.Ogrenci;
+        p.Calisiyor = vm.Calisiyor;
+        p.Meslek = BosIseNull(vm.Meslek);
+        p.Sinif = BosIseNull(vm.Sinif);
+        p.AramaTuru = vm.AramaTuru;
+        p.TercihOdaTipi = vm.TercihOdaTipi;
+        // Ev bilgisi sadece kiralık evi olanlar için anlamlı
+        p.EvTipi = vm.AramaTuru == AramaTuru.KiralikEv ? BosIseNull(vm.EvTipi) : null;
+        p.BosOda = vm.AramaTuru == AramaTuru.KiralikEv ? vm.BosOda : null;
+        p.Uyku = vm.Uyku;
+        p.CalismaDuzeni = vm.CalismaDuzeni;
+        p.EvcilHayvan = vm.EvcilHayvan;
+        p.HobilerMetni = Models.Hobiler.Birlestir(vm.Hobiler);
         p.GuncellemeTarihi = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -263,6 +302,8 @@ public class ProfilController : Controller
     }
 
     // ---------- Yardımcılar ----------
+
+    private static string? BosIseNull(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
 
     private async Task<ApplicationUser> MevcutKullanici()
     {

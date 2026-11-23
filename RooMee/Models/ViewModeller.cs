@@ -31,14 +31,57 @@ public class ProfilDuzenleViewModel
     [Display(Name = "Sigara içiyorum")]
     public bool SigaraIciyor { get; set; }
 
-    [Display(Name = "Evcil hayvanım var")]
-    public bool EvcilHayvanVar { get; set; }
-
-    [Display(Name = "Sessiz ortam isterim")]
-    public bool SessizOrtamIster { get; set; }
-
     [StringLength(1000), Display(Name = "Hakkımda")]
     public string? Hakkinda { get; set; }
+
+    // ---------- Ev arkadaşı profili ----------
+    [Display(Name = "Cinsiyet")]
+    public Cinsiyet? Cinsiyet { get; set; }
+
+    [Range(1950, 2010, ErrorMessage = "Doğum yılı 1950 ile 2010 arasında olmalı."), Display(Name = "Doğum yılı")]
+    public int? DogumYili { get; set; }
+
+    [StringLength(50), Display(Name = "Şehir")]
+    public string? Sehir { get; set; }
+
+    [StringLength(50), Display(Name = "İlçe")]
+    public string? Ilce { get; set; }
+
+    [Display(Name = "Öğrenciyim")]
+    public bool Ogrenci { get; set; }
+
+    [Display(Name = "Çalışıyorum")]
+    public bool Calisiyor { get; set; }
+
+    [StringLength(100), Display(Name = "Meslek / iş")]
+    public string? Meslek { get; set; }
+
+    [StringLength(20), Display(Name = "Sınıf")]
+    public string? Sinif { get; set; }
+
+    [Display(Name = "Ev arkadaşları listesinde")]
+    public AramaTuru? AramaTuru { get; set; }
+
+    [Display(Name = "Oda tipi tercihi")]
+    public TercihOdaTipi? TercihOdaTipi { get; set; }
+
+    [StringLength(10), Display(Name = "Ev tipi")]
+    public string? EvTipi { get; set; }
+
+    [Range(1, 10, ErrorMessage = "Boş oda sayısı 1 ile 10 arasında olmalı."), Display(Name = "Boş oda sayısı")]
+    public int? BosOda { get; set; }
+
+    [Display(Name = "Uyku düzeni")]
+    public UykuDuzeni? Uyku { get; set; }
+
+    [Display(Name = "Ders / çalışma düzeni")]
+    public CalismaDuzeni? CalismaDuzeni { get; set; }
+
+    [Display(Name = "Evcil hayvan")]
+    public EvcilHayvanDurumu? EvcilHayvan { get; set; }
+
+    [Display(Name = "Hobiler")]
+    public List<string> Hobiler { get; set; } = new();
 
     [Display(Name = "Profil fotoğrafı")]
     public IFormFile? Foto { get; set; }
@@ -113,6 +156,57 @@ public class IlanFormViewModel
 
     public List<int> SilinecekFotolar { get; set; } = new();
     public List<IlanFoto> MevcutFotolar { get; set; } = new();
+}
+
+// Ev arkadaşları listesi (/Kullanici). Alanlar adres çubuğundan gelir: /Kullanici?Sehir=Ankara&Uyku=Sabahci ...
+// Mantık: gruplar arası VE, grup içi VEYA; boş bırakılan filtre uygulanmaz.
+public class KullaniciFiltreViewModel
+{
+    public string? Sehir { get; set; }
+    public int? ButceMin { get; set; }
+    public int? ButceMax { get; set; }
+
+    // Kişisel
+    public int? YasMin { get; set; }
+    public int? YasMax { get; set; }
+    public List<Cinsiyet> Cinsiyet { get; set; } = new();
+    public List<string> Statu { get; set; } = new();          // ogrenci, calisan
+    public bool SadeceDogrulanmis { get; set; }
+
+    // Eğitim
+    public string? Universite { get; set; }
+    public string? Q { get; set; }                             // bölüm / meslek
+
+    // Yaşam
+    public List<UykuDuzeni> Uyku { get; set; } = new();
+    public List<CalismaDuzeni> Calisma { get; set; } = new();
+    public List<EvcilHayvanDurumu> Hayvan { get; set; } = new();
+    public List<string> Sigara { get; set; } = new();          // icmiyor, icer
+
+    // Oda
+    public List<AramaTuru> Tur { get; set; } = new();
+    public List<TercihOdaTipi> Oda { get; set; } = new();
+
+    public List<string> Hobi { get; set; } = new();
+
+    public string? Siralama { get; set; }                      // yeni, uyum, butce-artan, butce-azalan, yas-artan
+    public int Sayfa { get; set; } = 1;
+
+    // Sonuçlar
+    public List<KullaniciKartViewModel> Sonuclar { get; set; } = new();
+    public int ToplamSayi { get; set; }
+    public int ToplamSayfa { get; set; }
+    public List<(string Sehir, int Sayi)> Sehirler { get; set; } = new();
+    public List<string> Universiteler { get; set; } = new();
+    public bool UyumHesaplanabilir { get; set; }               // giriş yapmış ve profili dolu mu
+    public bool GirisYapti { get; set; }
+}
+
+public class KullaniciKartViewModel
+{
+    public ApplicationUser Kullanici { get; set; } = null!;
+    public Profil Profil => Kullanici.Profil!;
+    public int? Uyum { get; set; }
 }
 
 public class KonusmaOzetViewModel

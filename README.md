@@ -19,11 +19,11 @@ Adımlar:
 
 ### Test verisi (isteğe bağlı)
 
-Boş veritabanında denemek için 5 örnek kullanıcı ve 15 ilan eklenebilir. Uygulama kapalıyken proje klasöründe:
+Boş veritabanında denemek için 15 örnek kullanıcı (doldurulmuş ev arkadaşı profilleriyle) ve 15 ilan eklenebilir. Uygulama kapalıyken proje klasöründe:
 ```
 dotnet run --project RooMee -- --test-verisi
 ```
-Test hesaplarının e-postaları `mert@roomee.test`, `selin@roomee.test`, `zeynep@roomee.test`, `yusuf@roomee.test`, `elif@roomee.test`; şifreleri `Data/TestVerisi.cs` dosyasında yazıyor. Komut tekrar çalıştırılırsa aynı kullanıcıları ikinci kez eklemez.
+Test hesaplarının e-postaları `ad@roomee.test` biçimindedir (ör. `mert@roomee.test`, `selin@roomee.test`); şifreleri `Data/TestVerisi.cs` dosyasında yazıyor. Komut tekrar çalıştırılırsa aynı kullanıcıları ikinci kez eklemez.
 
 ## Çalışma düzeni
 
@@ -56,4 +56,6 @@ Visual Studio çakışan dosyaları gösterir. **Merge** ekranında iki tarafı 
 - Kayıt / giriş, öğrenci doğrulama, profil, hesap silme
 - İlan oluşturma, düzenleme, listeleme, fotoğraf yükleme
 - İlan filtreleme ve sayfalama, İlanlarım sayfası
-- Favoriler
+- Favoriler, mesajlaşma
+- Ev Arkadaşları: profil listesi, gelişmiş filtreler ve uyum yüzdesi
+  (tasarım ve filtre mantığı ToplumaHizmetVatanaHizmettir reposundaki `kullanicilar.html` prototipinden uyarlandı)

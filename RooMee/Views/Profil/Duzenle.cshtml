@@ -72,19 +72,112 @@
                 </div>
             </div>
 
-            <label class="form-label">Yaşam tarzı</label>
+            <h2 class="h6 mt-4 mb-3 border-bottom pb-2">Kişisel bilgiler</h2>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Cinsiyet" class="form-label"></label>
+                    <select asp-for="Cinsiyet" asp-items="Html.GetEnumSelectList<Cinsiyet>()" class="form-select">
+                        <option value="">Belirtmek istemiyorum</option>
+                    </select>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="DogumYili" class="form-label"></label>
+                    <input asp-for="DogumYili" class="form-control" placeholder="2003" />
+                    <span asp-validation-for="DogumYili" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Sehir" class="form-label"></label>
+                    <input asp-for="Sehir" class="form-control" placeholder="Konya" />
+                    <span asp-validation-for="Sehir" class="text-danger"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="Ilce" class="form-label"></label>
+                    <input asp-for="Ilce" class="form-control" placeholder="Selçuklu" />
+                </div>
+            </div>
+            <div class="mb-2">
+                <div class="form-check form-check-inline">
+                    <input asp-for="Ogrenci" class="form-check-input" />
+                    <label asp-for="Ogrenci" class="form-check-label"></label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input asp-for="Calisiyor" class="form-check-input" />
+                    <label asp-for="Calisiyor" class="form-check-label"></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Sinif" class="form-label"></label>
+                    <input asp-for="Sinif" class="form-control" placeholder="3. sınıf" />
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="Meslek" class="form-label"></label>
+                    <input asp-for="Meslek" class="form-control" placeholder="Hemşire, yazılımcı…" />
+                </div>
+            </div>
+
+            <h2 class="h6 mt-4 mb-3 border-bottom pb-2">Yaşam tercihleri</h2>
+            <div class="row">
+                <div class="col-sm-4 mb-3">
+                    <label asp-for="Uyku" class="form-label"></label>
+                    <select asp-for="Uyku" asp-items="Html.GetEnumSelectList<UykuDuzeni>()" class="form-select">
+                        <option value="">Seç</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <label asp-for="CalismaDuzeni" class="form-label"></label>
+                    <select asp-for="CalismaDuzeni" asp-items="Html.GetEnumSelectList<CalismaDuzeni>()" class="form-select">
+                        <option value="">Seç</option>
+                    </select>
+                </div>
+                <div class="col-sm-4 mb-3">
+                    <label asp-for="EvcilHayvan" class="form-label"></label>
+                    <select asp-for="EvcilHayvan" asp-items="Html.GetEnumSelectList<EvcilHayvanDurumu>()" class="form-select">
+                        <option value="">Seç</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input asp-for="SigaraIciyor" class="form-check-input" />
+                <label asp-for="SigaraIciyor" class="form-check-label"></label>
+            </div>
+            <label class="form-label">Hobiler</label>
             <div class="mb-3">
-                <div class="form-check form-switch">
-                    <input asp-for="SigaraIciyor" class="form-check-input" />
-                    <label asp-for="SigaraIciyor" class="form-check-label"></label>
+                @foreach (var h in Hobiler.Liste)
+                {
+                    var id = "hobi-" + Array.IndexOf(Hobiler.Liste, h);
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="Hobiler" value="@h" id="@id" checked="@Model.Hobiler.Contains(h)" />
+                        <label class="form-check-label" for="@id">@h</label>
+                    </div>
+                }
+            </div>
+
+            <h2 class="h6 mt-4 mb-3 border-bottom pb-2">Ev arkadaşları listesi</h2>
+            <div class="mb-3">
+                <label asp-for="AramaTuru" class="form-label"></label>
+                <select asp-for="AramaTuru" asp-items="Html.GetEnumSelectList<AramaTuru>()" class="form-select" id="arama-turu">
+                    <option value="">Listede görünme</option>
+                </select>
+                <div class="form-text">Seçersen profilin "Ev Arkadaşları" sayfasında listelenir. E-posta adresin hiçbir zaman gösterilmez.</div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="TercihOdaTipi" class="form-label"></label>
+                <select asp-for="TercihOdaTipi" asp-items="Html.GetEnumSelectList<TercihOdaTipi>()" class="form-select">
+                    <option value="">Fark etmez</option>
+                </select>
+            </div>
+            <div class="row" id="ev-bilgisi">
+                <div class="col-6 mb-3">
+                    <label asp-for="EvTipi" class="form-label"></label>
+                    <input asp-for="EvTipi" class="form-control" placeholder="2+1" />
                 </div>
-                <div class="form-check form-switch">
-                    <input asp-for="EvcilHayvanVar" class="form-check-input" />
-                    <label asp-for="EvcilHayvanVar" class="form-check-label"></label>
-                </div>
-                <div class="form-check form-switch">
-                    <input asp-for="SessizOrtamIster" class="form-check-input" />
-                    <label asp-for="SessizOrtamIster" class="form-check-label"></label>
+                <div class="col-6 mb-3">
+                    <label asp-for="BosOda" class="form-label"></label>
+                    <input asp-for="BosOda" class="form-control" placeholder="1" />
+                    <span asp-validation-for="BosOda" class="text-danger"></span>
                 </div>
             </div>
 
@@ -110,4 +203,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Ev tipi ve boş oda alanları sadece "Kiralık ev ilanı" seçiliyse görünsün
+        const tur = document.getElementById('arama-turu');
+        const ev = document.getElementById('ev-bilgisi');
+        const guncelle = () => ev.style.display = tur.value === '@((int)AramaTuru.KiralikEv)' ? '' : 'none';
+        tur.addEventListener('change', guncelle);
+        guncelle();
+    </script>
 }

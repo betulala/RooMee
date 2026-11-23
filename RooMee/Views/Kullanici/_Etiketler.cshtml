@@ -1,0 +1,22 @@
+@model ApplicationUser
+@{
+    // Kart ve profil sayfasında aynı sırayla gösterilen etiketler
+    var p = Model.Profil!;
+    var yasCins = string.Join(", ", new[] { p.Yas.HasValue ? $"{p.Yas} yaş" : null, p.Cinsiyet?.GorunenAd() }.Where(x => x != null));
+}
+<div class="etiketler">
+    @if (p.AramaTuru.HasValue)
+    {
+        <span class="etiket dolu">
+            @(p.AramaTuru == AramaTuru.KiralikEv && !string.IsNullOrEmpty(p.EvTipi) ? $"Kiralık ev · {p.EvTipi}" : p.AramaTuru.Value.GorunenAd())
+        </span>
+    }
+    @if (yasCins != "") { <span class="etiket">@yasCins</span> }
+    @if (p.Ogrenci) { <span class="etiket">Öğrenci</span> }
+    @if (p.Calisiyor) { <span class="etiket">Çalışan</span> }
+    @if (p.TercihOdaTipi.HasValue) { <span class="etiket">@p.TercihOdaTipi.Value.GorunenAd()</span> }
+    @if (p.Uyku.HasValue) { <span class="etiket">@p.Uyku.Value.GorunenAd()</span> }
+    @if (p.EvcilHayvan.HasValue && p.EvcilHayvan != EvcilHayvanDurumu.Istemiyor) { <span class="etiket">@p.EvcilHayvan.Value.GorunenAd()</span> }
+    <span class="etiket">@(p.SigaraIciyor ? "Sigara içer" : "Sigara içmez")</span>
+    @if (Model.OgrenciDogrulandi) { <span class="etiket vurgu">Doğrulanmış öğrenci</span> }
+</div>

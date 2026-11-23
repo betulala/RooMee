@@ -1,0 +1,15 @@
+@model ApplicationUser
+@{
+    var p = Model.Profil;
+    var alt = p?.AramaTuru == AramaTuru.KiralikEv ? " alt" : "";
+    var buyuk = ViewData["Buyuk"] as bool? == true ? " buyuk" : "";
+    var basHarfler = ($"{Model.Ad.FirstOrDefault()}{Model.Soyad.FirstOrDefault()}").ToUpper(new System.Globalization.CultureInfo("tr-TR"));
+}
+@if (!string.IsNullOrEmpty(p?.FotoYolu))
+{
+    <img src="@p.FotoYolu" alt="" class="avatar@(buyuk)" />
+}
+else
+{
+    <div class="avatar@(alt)@(buyuk)" aria-hidden="true">@basHarfler</div>
+}

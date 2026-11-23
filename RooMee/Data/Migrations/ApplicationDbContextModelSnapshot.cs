@@ -442,9 +442,15 @@ namespace RooMee.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AramaTuru")
+                        .HasColumnType("int");
+
                     b.Property<string>("Bolum")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("BosOda")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ButceMax")
                         .HasColumnType("int");
@@ -452,8 +458,24 @@ namespace RooMee.Data.Migrations
                     b.Property<int?>("ButceMin")
                         .HasColumnType("int");
 
-                    b.Property<bool>("EvcilHayvanVar")
+                    b.Property<bool>("Calisiyor")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("CalismaDuzeni")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Cinsiyet")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DogumYili")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EvTipi")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<int?>("EvcilHayvan")
+                        .HasColumnType("int");
 
                     b.Property<string>("FotoYolu")
                         .HasColumnType("nvarchar(max)");
@@ -465,6 +487,14 @@ namespace RooMee.Data.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("HobilerMetni")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Ilce")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<TimeOnly?>("KalkisSaati")
                         .HasColumnType("time");
 
@@ -472,15 +502,33 @@ namespace RooMee.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("SessizOrtamIster")
+                    b.Property<string>("Meslek")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("Ogrenci")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Sehir")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("SigaraIciyor")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Sinif")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("TercihOdaTipi")
+                        .HasColumnType("int");
+
                     b.Property<string>("Universite")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("Uyku")
+                        .HasColumnType("int");
 
                     b.Property<TimeOnly?>("YatisSaati")
                         .HasColumnType("time");
