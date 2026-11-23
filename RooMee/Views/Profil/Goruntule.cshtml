@@ -96,7 +96,7 @@
                     }
                     else
                     {
-                        <button class="btn btn-primary" disabled title="Yakında">Mesaj gönder</button>
+                        <a asp-controller="Mesaj" asp-action="Yeni" asp-route-kullaniciId="@Model.Id" class="btn btn-primary">✉ Mesaj gönder</a>
                     }
                 </div>
             </div>

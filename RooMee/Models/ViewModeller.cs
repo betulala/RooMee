@@ -115,6 +115,13 @@ public class IlanFormViewModel
     public List<IlanFoto> MevcutFotolar { get; set; } = new();
 }
 
+public class KonusmaOzetViewModel
+{
+    public Konusma Konusma { get; set; } = null!;
+    public Mesaj SonMesaj { get; set; } = null!;
+    public int Okunmamis { get; set; }
+}
+
 public class IlanAramaViewModel
 {
     // Filtreler (adres çubuğundan gelir: /Ilan?Sehir=Konya&KiraMax=6000 ...)

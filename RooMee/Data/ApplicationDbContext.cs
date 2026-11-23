@@ -14,6 +14,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<IlanFoto> IlanFotolari => Set<IlanFoto>();
     public DbSet<Favori> Favoriler => Set<Favori>();
     public DbSet<Sikayet> Sikayetler => Set<Sikayet>();
+    public DbSet<Konusma> Konusmalar => Set<Konusma>();
+    public DbSet<Mesaj> Mesajlar => Set<Mesaj>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -55,5 +57,34 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(s => s.Ilan).WithMany()
             .HasForeignKey(s => s.IlanId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // İki kişi arasında tek konuşma olur.
+        // Kullanıcı silinince konuşmaları hesap silme sırasında elle silinir.
+        builder.Entity<Konusma>()
+            .HasIndex(k => new { k.Kullanici1Id, k.Kullanici2Id }).IsUnique();
+        builder.Entity<Konusma>()
+            .HasOne(k => k.Kullanici1).WithMany()
+            .HasForeignKey(k => k.Kullanici1Id)
+            .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Konusma>()
+            .HasOne(k => k.Kullanici2).WithMany()
+            .HasForeignKey(k => k.Kullanici2Id)
+            .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Konusma>()
+            .HasOne(k => k.Ilan).WithMany()
+            .HasForeignKey(k => k.IlanId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Konuşma silinince mesajları da silinir
+        builder.Entity<Mesaj>()
+            .HasOne(m => m.Konusma).WithMany(k => k.Mesajlar)
+            .HasForeignKey(m => m.KonusmaId)
+            .OnDelete(DeleteBehavior.Cascade);
+        builder.Entity<Mesaj>()
+            .HasOne(m => m.Gonderen).WithMany()
+            .HasForeignKey(m => m.GonderenId)
+            .OnDelete(DeleteBehavior.NoAction);
+        builder.Entity<Mesaj>()
+            .HasIndex(m => new { m.KonusmaId, m.Tarih });
     }
 }

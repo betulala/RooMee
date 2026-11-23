@@ -114,7 +114,16 @@
         else
         {
             <div class="d-grid gap-2">
-                <button class="btn btn-primary" disabled title="Yakında">İletişime geç</button>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Mesaj" asp-action="Yeni" asp-route-kullaniciId="@sahip.Id" asp-route-ilanId="@Model.Id"
+                       class="btn btn-primary">✉ İletişime geç</a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-primary">✉ İletişime geçmek için giriş yap</a>
+                }
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <form asp-controller="Favori" asp-action="Degistir" method="post">

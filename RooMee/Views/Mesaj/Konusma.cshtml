@@ -1,0 +1,104 @@
+@model Konusma
+@{
+    string benimId = ViewBag.BenimId;
+    var karsi = Model.KarsiTaraf(benimId);
+    ViewData["Title"] = karsi?.KisaAd ?? "Mesajlar";
+    DateTime? oncekiGun = null;
+}
+@functions {
+    string GunBasligi(DateTime gun)
+    {
+        if (gun == DateTime.Today) return "Bugün";
+        if (gun == DateTime.Today.AddDays(-1)) return "Dün";
+        return gun.ToString("d MMMM yyyy");
+    }
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <!-- Üst bilgi -->
+            <div class="card-header bg-white d-flex align-items-center gap-3">
+                <a asp-action="Index" class="btn btn-sm btn-link text-decoration-none px-0" title="Mesajlarım">←</a>
+                <partial name="_Avatar" model="karsi" view-data='new ViewDataDictionary(ViewData) { ["Boyut"] = 40 }' />
+                <div class="flex-grow-1">
+                    @if (karsi != null)
+                    {
+                        <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@karsi.Id" class="fw-semibold text-decoration-none">@karsi.KisaAd</a>
+                        @if (karsi.OgrenciDogrulandi)
+                        {
+                            <span class="badge bg-success ms-1">✓ Öğrenci</span>
+                        }
+                    }
+                    @if (Model.Ilan != null)
+                    {
+                        <div class="small text-muted">
+                            İlan: <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.Ilan.Id">@Model.Ilan.Baslik</a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Mesajlar -->
+            <div id="mesajlar" class="card-body bg-light" style="height:60vh;overflow-y:auto">
+                @if (!Model.Mesajlar.Any())
+                {
+                    <p class="text-center text-muted small my-5">Henüz mesaj yok. İlk mesajı sen gönder!</p>
+                }
+                @foreach (var m in Model.Mesajlar)
+                {
+                    var yerel = m.Tarih.ToLocalTime();
+                    bool benim = m.GonderenId == benimId;
+
+                    if (oncekiGun != yerel.Date)
+                    {
+                        oncekiGun = yerel.Date;
+                        <div class="text-center my-2"><span class="badge text-bg-secondary fw-normal">@GunBasligi(yerel.Date)</span></div>
+                    }
+
+                    <div class="d-flex mb-2 @(benim ? "justify-content-end" : "justify-content-start")">
+                        <div class="px-3 py-2 rounded-3 shadow-sm @(benim ? "bg-primary text-white" : "bg-white")" style="max-width:75%">
+                            <div style="white-space:pre-line;word-break:break-word">@m.Metin</div>
+                            <div class="small text-end @(benim ? "text-white-50" : "text-muted")" style="font-size:.75rem">
+                                @yerel.ToString("HH:mm")
+                                @if (benim)
+                                {
+                                    <span title="@(m.Okundu ? "Okundu" : "Gönderildi")">@(m.Okundu ? "✓✓" : "✓")</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Gönderme kutusu -->
+            <div class="card-footer bg-white">
+                <form asp-action="Gonder" method="post" class="d-flex gap-2">
+                    <input type="hidden" name="konusmaId" value="@Model.Id" />
+                    <textarea name="metin" id="metin" class="form-control" rows="1" maxlength="1000" required
+                              placeholder="Mesaj yaz..." style="resize:none"></textarea>
+                    <button type="submit" class="btn btn-primary">Gönder</button>
+                </form>
+                <div class="small text-muted mt-1">Enter: gönder · Shift+Enter: yeni satır</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // En son mesaja kaydır
+        const kutu = document.getElementById('mesajlar');
+        kutu.scrollTop = kutu.scrollHeight;
+
+        // Enter ile gönder, Shift+Enter ile alt satır
+        const metin = document.getElementById('metin');
+        metin.focus();
+        metin.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (metin.value.trim()) metin.form.requestSubmit();
+            }
+        });
+    </script>
+}

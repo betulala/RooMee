@@ -1,11 +1,26 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject RooMee.Data.ApplicationDbContext Db
+@using Microsoft.EntityFrameworkCore
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         var kullanici = await UserManager.GetUserAsync(User);
+        var benimId = kullanici?.Id;
+        var okunmamis = benimId == null ? 0 : await Db.Mesajlar.CountAsync(m =>
+            !m.Okundu && m.GonderenId != benimId &&
+            (m.Konusma!.Kullanici1Id == benimId || m.Konusma.Kullanici2Id == benimId));
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Mesaj" asp-action="Index">
+                Mesajlarım
+                @if (okunmamis > 0)
+                {
+                    <span class="badge rounded-pill bg-danger">@okunmamis</span>
+                }
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Profil" asp-action="Goruntule">Profilim (@kullanici?.Ad)</a>
         </li>

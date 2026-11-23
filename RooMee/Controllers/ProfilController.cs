@@ -239,6 +239,10 @@ public class ProfilController : Controller
         await _db.Sikayetler
             .Where(s => s.SikayetEdenId == k.Id || s.SikayetEdilenKullaniciId == k.Id)
             .ExecuteDeleteAsync();
+        // Konuşmaları sil (mesajlar zincirleme silinir)
+        await _db.Konusmalar
+            .Where(x => x.Kullanici1Id == k.Id || x.Kullanici2Id == k.Id)
+            .ExecuteDeleteAsync();
 
         // Kullanıcıyı sil (profil, ilanlar ve ilan fotoğrafları kayıtları otomatik silinir)
         var sonuc = await _userManager.DeleteAsync(k);

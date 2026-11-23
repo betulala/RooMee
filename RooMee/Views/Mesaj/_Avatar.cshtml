@@ -1,0 +1,16 @@
+@model ApplicationUser?
+@{
+    var boyut = ViewData["Boyut"] as int? ?? 48;
+    var foto = Model?.Profil?.FotoYolu;
+}
+@if (!string.IsNullOrEmpty(foto))
+{
+    <img src="@foto" alt="" class="rounded-circle flex-shrink-0" style="width:@(boyut)px;height:@(boyut)px;object-fit:cover" />
+}
+else
+{
+    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+         style="width:@(boyut)px;height:@(boyut)px;font-size:@(boyut * 0.4)px">
+        @(Model?.Ad.FirstOrDefault() ?? '?')
+    </div>
+}

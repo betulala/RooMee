@@ -1,0 +1,52 @@
+@{
+    ApplicationUser karsi = ViewBag.Karsi;
+    Ilan? ilan = ViewBag.Ilan;
+    ViewData["Title"] = "Mesaj gönder";
+    var oneri = ilan != null
+        ? $"Merhaba, \"{ilan.Baslik}\" ilanınla ilgileniyorum. Oda hâlâ müsait mi?"
+        : "Merhaba, ";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        @if (TempData["Hata"] is string hata)
+        {
+            <div class="alert alert-danger">@hata</div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <partial name="_Avatar" model="karsi" />
+                    <div>
+                        <div class="small text-muted">Alıcı</div>
+                        <span class="fw-semibold">@karsi.KisaAd</span>
+                        @if (karsi.OgrenciDogrulandi)
+                        {
+                            <span class="badge bg-success ms-1">✓ Öğrenci</span>
+                        }
+                    </div>
+                </div>
+
+                @if (ilan != null)
+                {
+                    <div class="alert alert-light border small py-2">
+                        İlan: <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@ilan.Id">@ilan.Baslik</a>
+                        · @ilan.Kira.ToString("N0") TL / ay
+                    </div>
+                }
+
+                <form asp-action="Yeni" method="post">
+                    <input type="hidden" name="kullaniciId" value="@karsi.Id" />
+                    <input type="hidden" name="ilanId" value="@ilan?.Id" />
+                    <label for="metin" class="form-label">Mesajın</label>
+                    <textarea id="metin" name="metin" class="form-control mb-3" rows="4" maxlength="1000" required>@oneri</textarea>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Gönder</button>
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary">Vazgeç</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

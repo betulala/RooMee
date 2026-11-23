@@ -362,6 +362,78 @@ namespace RooMee.Data.Migrations
                     b.ToTable("IlanFotolari");
                 });
 
+            modelBuilder.Entity("RooMee.Models.Konusma", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("IlanId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Kullanici1Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Kullanici2Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("OlusturmaTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SonMesajTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IlanId");
+
+                    b.HasIndex("Kullanici2Id");
+
+                    b.HasIndex("Kullanici1Id", "Kullanici2Id")
+                        .IsUnique();
+
+                    b.ToTable("Konusmalar");
+                });
+
+            modelBuilder.Entity("RooMee.Models.Mesaj", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("GonderenId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("KonusmaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Metin")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("Okundu")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Tarih")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GonderenId");
+
+                    b.HasIndex("KonusmaId", "Tarih");
+
+                    b.ToTable("Mesajlar");
+                });
+
             modelBuilder.Entity("RooMee.Models.Profil", b =>
                 {
                     b.Property<int>("Id")
@@ -557,6 +629,51 @@ namespace RooMee.Data.Migrations
                     b.Navigation("Ilan");
                 });
 
+            modelBuilder.Entity("RooMee.Models.Konusma", b =>
+                {
+                    b.HasOne("RooMee.Models.Ilan", "Ilan")
+                        .WithMany()
+                        .HasForeignKey("IlanId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("RooMee.Models.ApplicationUser", "Kullanici1")
+                        .WithMany()
+                        .HasForeignKey("Kullanici1Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RooMee.Models.ApplicationUser", "Kullanici2")
+                        .WithMany()
+                        .HasForeignKey("Kullanici2Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Ilan");
+
+                    b.Navigation("Kullanici1");
+
+                    b.Navigation("Kullanici2");
+                });
+
+            modelBuilder.Entity("RooMee.Models.Mesaj", b =>
+                {
+                    b.HasOne("RooMee.Models.ApplicationUser", "Gonderen")
+                        .WithMany()
+                        .HasForeignKey("GonderenId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RooMee.Models.Konusma", "Konusma")
+                        .WithMany("Mesajlar")
+                        .HasForeignKey("KonusmaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Gonderen");
+
+                    b.Navigation("Konusma");
+                });
+
             modelBuilder.Entity("RooMee.Models.Profil", b =>
                 {
                     b.HasOne("RooMee.Models.ApplicationUser", "Kullanici")
@@ -603,6 +720,11 @@ namespace RooMee.Data.Migrations
             modelBuilder.Entity("RooMee.Models.Ilan", b =>
                 {
                     b.Navigation("Fotolar");
+                });
+
+            modelBuilder.Entity("RooMee.Models.Konusma", b =>
+                {
+                    b.Navigation("Mesajlar");
                 });
 #pragma warning restore 612, 618
         }
