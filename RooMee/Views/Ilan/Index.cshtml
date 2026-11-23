@@ -1,6 +1,15 @@
-﻿@model List<Ilan>
+﻿@model IlanAramaViewModel
 @{
     ViewData["Title"] = "İlanlar";
+}
+@functions {
+    // Sayfa bağlantılarında mevcut filtreleri korur
+    Dictionary<string, string> Rota(int sayfa)
+    {
+        var d = Context.Request.Query.ToDictionary(k => k.Key, v => v.Value.ToString());
+        d["Sayfa"] = sayfa.ToString();
+        return d;
+    }
 }
 
 @if (TempData["Mesaj"] is string mesaj)
@@ -13,16 +22,124 @@
     <a asp-action="Olustur" class="btn btn-primary">+ İlan ver</a>
 </div>
 
-@if (!Model.Any())
-{
-    <p class="text-muted">Henüz ilan yok. İlk ilanı sen ver!</p>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-        @foreach (var ilan in Model)
+<div class="row g-4">
+    <!-- Filtre paneli -->
+    <div class="col-lg-3">
+        <form asp-action="Index" method="get" class="card card-body shadow-sm">
+            <h2 class="h6 mb-3">Filtrele</h2>
+
+            <div class="mb-2">
+                <label class="form-label small mb-1" for="Sehir">Şehir</label>
+                <input class="form-control form-control-sm" id="Sehir" name="Sehir" value="@Model.Sehir"
+                       list="sehirListesi" placeholder="Örn. Konya" />
+                <datalist id="sehirListesi">
+                    @foreach (var s in Model.Sehirler)
+                    {
+                        <option value="@s"></option>
+                    }
+                </datalist>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label small mb-1" for="Ilce">İlçe</label>
+                <input class="form-control form-control-sm" id="Ilce" name="Ilce" value="@Model.Ilce" placeholder="Örn. Selçuklu" />
+            </div>
+
+            <label class="form-label small mb-1">Kira (TL)</label>
+            <div class="d-flex gap-2 mb-2">
+                <input class="form-control form-control-sm" type="number" min="0" name="KiraMin" value="@Model.KiraMin" placeholder="En az" />
+                <input class="form-control form-control-sm" type="number" min="0" name="KiraMax" value="@Model.KiraMax" placeholder="En fazla" />
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label small mb-1" for="OdaTipi">Oda tipi</label>
+                <select class="form-select form-select-sm" id="OdaTipi" name="OdaTipi">
+                    <option value="">Hepsi</option>
+                    @foreach (var tip in Enum.GetValues<OdaTipi>())
+                    {
+                        <option value="@tip" selected="@(Model.OdaTipi == tip)">@tip.GorunenAd()</option>
+                    }
+                </select>
+            </div>
+
+            <label class="form-label small mb-1">Kriterler</label>
+            <div class="mb-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="f-ogr" name="SadeceOgrenci" value="true" checked="@Model.SadeceOgrenci" />
+                    <label class="form-check-label small" for="f-ogr">Öğrenci arayan</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="f-sig" name="SigaraIcmeyen" value="true" checked="@Model.SigaraIcmeyen" />
+                    <label class="form-check-label small" for="f-sig">Sigara içmeyen</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="f-ses" name="Sessiz" value="true" checked="@Model.Sessiz" />
+                    <label class="form-check-label small" for="f-ses">Sessiz</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="f-evc" name="EvcilHayvanKabul" value="true" checked="@Model.EvcilHayvanKabul" />
+                    <label class="form-check-label small" for="f-evc">Evcil hayvan kabul</label>
+                </div>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="f-dog" name="SadeceDogrulanmis" value="true" checked="@Model.SadeceDogrulanmis" />
+                <label class="form-check-label small" for="f-dog">Sadece doğrulanmış öğrenciler</label>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small mb-1" for="Siralama">Sırala</label>
+                <select class="form-select form-select-sm" id="Siralama" name="Siralama">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.Siralama))">En yeni</option>
+                    <option value="ucuz" selected="@(Model.Siralama == "ucuz")">Kira: en düşük</option>
+                    <option value="pahali" selected="@(Model.Siralama == "pahali")">Kira: en yüksek</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm w-100">Ara</button>
+            <a asp-action="Index" class="btn btn-link btn-sm w-100">Filtreleri temizle</a>
+        </form>
+    </div>
+
+    <!-- Sonuçlar -->
+    <div class="col-lg-9">
+        <p class="text-muted small mb-2">@Model.ToplamSayi ilan bulundu</p>
+
+        @if (!Model.Sonuclar.Any())
         {
-            <partial name="_IlanKarti" model="ilan" />
+            <div class="text-center text-muted py-5">
+                Aradığın kriterlere uygun ilan bulunamadı.<br />
+                <a asp-action="Index">Tüm ilanları göster</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3">
+                @foreach (var ilan in Model.Sonuclar)
+                {
+                    <partial name="_IlanKarti" model="ilan" />
+                }
+            </div>
+        }
+
+        @if (Model.ToplamSayfa > 1)
+        {
+            <nav aria-label="Sayfalar">
+                <ul class="pagination justify-content-center mt-4">
+                    <li class="page-item @(Model.Sayfa == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="Rota(Model.Sayfa - 1)">Önceki</a>
+                    </li>
+                    @for (int i = 1; i <= Model.ToplamSayfa; i++)
+                    {
+                        <li class="page-item @(i == Model.Sayfa ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-all-route-data="Rota(i)">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.Sayfa == Model.ToplamSayfa ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-all-route-data="Rota(Model.Sayfa + 1)">Sonraki</a>
+                    </li>
+                </ul>
+            </nav>
         }
     </div>
-}
+</div>

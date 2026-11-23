@@ -114,3 +114,26 @@ public class IlanFormViewModel
     public List<int> SilinecekFotolar { get; set; } = new();
     public List<IlanFoto> MevcutFotolar { get; set; } = new();
 }
+
+public class IlanAramaViewModel
+{
+    // Filtreler (adres çubuğundan gelir: /Ilan?Sehir=Konya&KiraMax=6000 ...)
+    public string? Sehir { get; set; }
+    public string? Ilce { get; set; }
+    public int? KiraMin { get; set; }
+    public int? KiraMax { get; set; }
+    public OdaTipi? OdaTipi { get; set; }
+    public bool SadeceOgrenci { get; set; }
+    public bool SigaraIcmeyen { get; set; }
+    public bool Sessiz { get; set; }
+    public bool EvcilHayvanKabul { get; set; }
+    public bool SadeceDogrulanmis { get; set; }
+    public string? Siralama { get; set; }
+    public int Sayfa { get; set; } = 1;
+
+    // Sonuçlar
+    public List<Ilan> Sonuclar { get; set; } = new();
+    public int ToplamSayi { get; set; }
+    public int ToplamSayfa { get; set; }
+    public List<string> Sehirler { get; set; } = new();
+}

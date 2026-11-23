@@ -26,15 +26,70 @@ public class IlanController : Controller
 
     // Tüm yayındaki ilanlar (giriş yapmadan da görülebilir)
     [AllowAnonymous]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index([FromQuery] IlanAramaViewModel f)
     {
-        var ilanlar = await _db.Ilanlar
-            .Where(i => i.Aktif)
+        const int SayfaBoyutu = 12;
+
+        var q = _db.Ilanlar.Where(i => i.Aktif);
+
+        if (!string.IsNullOrWhiteSpace(f.Sehir))
+        {
+            var sehir = f.Sehir.Trim();
+            q = q.Where(i => i.Sehir.Contains(sehir));
+        }
+        if (!string.IsNullOrWhiteSpace(f.Ilce))
+        {
+            var ilce = f.Ilce.Trim();
+            q = q.Where(i => i.Ilce.Contains(ilce));
+        }
+        if (f.KiraMin.HasValue)
+        {
+            var min = f.KiraMin.Value;
+            q = q.Where(i => i.Kira >= min);
+        }
+        if (f.KiraMax.HasValue)
+        {
+            var max = f.KiraMax.Value;
+            q = q.Where(i => i.Kira <= max);
+        }
+        if (f.OdaTipi.HasValue)
+        {
+            var tip = f.OdaTipi.Value;
+            q = q.Where(i => i.OdaTipi == tip);
+        }
+        if (f.SadeceOgrenci) q = q.Where(i => i.SadeceOgrenci);
+        if (f.SigaraIcmeyen) q = q.Where(i => i.SigaraIcmeyen);
+        if (f.Sessiz) q = q.Where(i => i.Sessiz);
+        if (f.EvcilHayvanKabul) q = q.Where(i => i.EvcilHayvanKabul);
+        if (f.SadeceDogrulanmis) q = q.Where(i => i.Kullanici!.OgrenciDogrulandi);
+
+        q = f.Siralama switch
+        {
+            "ucuz" => q.OrderBy(i => i.Kira),
+            "pahali" => q.OrderByDescending(i => i.Kira),
+            _ => q.OrderByDescending(i => i.OlusturmaTarihi)
+        };
+
+        f.ToplamSayi = await q.CountAsync();
+        f.ToplamSayfa = Math.Max(1, (int)Math.Ceiling(f.ToplamSayi / (double)SayfaBoyutu));
+        f.Sayfa = Math.Clamp(f.Sayfa, 1, f.ToplamSayfa);
+
+        f.Sonuclar = await q
             .Include(i => i.Kullanici)
             .Include(i => i.Fotolar)
-            .OrderByDescending(i => i.OlusturmaTarihi)
+            .Skip((f.Sayfa - 1) * SayfaBoyutu)
+            .Take(SayfaBoyutu)
             .ToListAsync();
-        return View(ilanlar);
+
+        // Şehir kutusunda öneri olarak çıkacak şehirler
+        f.Sehirler = await _db.Ilanlar
+            .Where(i => i.Aktif)
+            .Select(i => i.Sehir)
+            .Distinct()
+            .OrderBy(s => s)
+            .ToListAsync();
+
+        return View(f);
     }
 
     [AllowAnonymous]
