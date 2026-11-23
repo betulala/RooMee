@@ -69,3 +69,48 @@ public class HesapSilViewModel
     [Display(Name = "Hesabımın ve tüm verilerimin kalıcı olarak silineceğini anlıyorum.")]
     public bool Onay { get; set; }
 }
+
+public class IlanFormViewModel
+{
+    public int? Id { get; set; }
+
+    [Required(ErrorMessage = "Başlık zorunludur."), StringLength(100), Display(Name = "İlan başlığı")]
+    public string Baslik { get; set; } = "";
+
+    [Required(ErrorMessage = "Şehir zorunludur."), StringLength(50), Display(Name = "Şehir")]
+    public string Sehir { get; set; } = "";
+
+    [Required(ErrorMessage = "İlçe zorunludur."), StringLength(50), Display(Name = "İlçe")]
+    public string Ilce { get; set; } = "";
+
+    [Required(ErrorMessage = "Kira zorunludur."), Range(0, 200000, ErrorMessage = "Geçerli bir tutar gir.")]
+    [Display(Name = "Aylık kira (TL)")]
+    public int? Kira { get; set; }
+
+    [Display(Name = "Oda tipi")]
+    public OdaTipi OdaTipi { get; set; }
+
+    [StringLength(2000), Display(Name = "Açıklama")]
+    public string? Aciklama { get; set; }
+
+    [Display(Name = "Öğrenci olsun")]
+    public bool SadeceOgrenci { get; set; } = true;
+
+    [Display(Name = "Sigara içmesin")]
+    public bool SigaraIcmeyen { get; set; }
+
+    [Display(Name = "Sessiz olsun")]
+    public bool Sessiz { get; set; }
+
+    [Display(Name = "Evcil hayvan kabul")]
+    public bool EvcilHayvanKabul { get; set; }
+
+    [Display(Name = "İlan yayında")]
+    public bool Aktif { get; set; } = true;
+
+    [Display(Name = "Fotoğraf ekle")]
+    public List<IFormFile>? YeniFotolar { get; set; }
+
+    public List<int> SilinecekFotolar { get; set; } = new();
+    public List<IlanFoto> MevcutFotolar { get; set; } = new();
+}

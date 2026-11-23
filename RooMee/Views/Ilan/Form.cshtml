@@ -1,0 +1,112 @@
+﻿@model IlanFormViewModel
+@{
+    bool yeni = Model.Id == null;
+    ViewData["Title"] = yeni ? "İlan Oluştur" : "İlanı Düzenle";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <h1 class="h3 mb-4">@ViewData["Title"]</h1>
+
+        <form asp-action="@(yeni ? "Olustur" : "Duzenle")" asp-route-id="@Model.Id"
+              method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Baslik" class="form-label"></label>
+                <input asp-for="Baslik" class="form-control" placeholder="Merkezde 2+1 evde ortak oda" />
+                <span asp-validation-for="Baslik" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label asp-for="Sehir" class="form-label"></label>
+                    <input asp-for="Sehir" class="form-control" placeholder="Konya" />
+                    <span asp-validation-for="Sehir" class="text-danger"></span>
+                </div>
+                <div class="col-6 mb-3">
+                    <label asp-for="Ilce" class="form-label"></label>
+                    <input asp-for="Ilce" class="form-control" placeholder="Selçuklu" />
+                    <span asp-validation-for="Ilce" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Kira" class="form-label"></label>
+                <input asp-for="Kira" class="form-control" placeholder="4500" />
+                <span asp-validation-for="Kira" class="text-danger"></span>
+            </div>
+
+            <label class="form-label">Oda tipi</label>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                @foreach (var tip in Enum.GetValues<OdaTipi>())
+                {
+                    <input type="radio" class="btn-check" asp-for="OdaTipi" value="@tip" id="oda-@tip" />
+                    <label class="btn btn-outline-primary btn-sm" for="oda-@tip">@tip.GorunenAd()</label>
+                }
+            </div>
+
+            <label class="form-label">Aranan ev arkadaşı kriterleri</label>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <input asp-for="SadeceOgrenci" class="btn-check" />
+                <label asp-for="SadeceOgrenci" class="btn btn-outline-secondary btn-sm"></label>
+                <input asp-for="SigaraIcmeyen" class="btn-check" />
+                <label asp-for="SigaraIcmeyen" class="btn btn-outline-secondary btn-sm"></label>
+                <input asp-for="Sessiz" class="btn-check" />
+                <label asp-for="Sessiz" class="btn btn-outline-secondary btn-sm"></label>
+                <input asp-for="EvcilHayvanKabul" class="btn-check" />
+                <label asp-for="EvcilHayvanKabul" class="btn btn-outline-secondary btn-sm"></label>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Aciklama" class="form-label"></label>
+                <textarea asp-for="Aciklama" class="form-control" rows="5"
+                          placeholder="Ev, oda, ulaşım, faturalar, ev kuralları…"></textarea>
+                <span asp-validation-for="Aciklama" class="text-danger"></span>
+            </div>
+
+            @if (Model.MevcutFotolar.Any())
+            {
+                <label class="form-label">Mevcut fotoğraflar <span class="text-muted small">(silmek istediklerini işaretle)</span></label>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    @foreach (var f in Model.MevcutFotolar)
+                    {
+                        <div class="text-center">
+                            <img src="@f.Yol" alt="" class="rounded border d-block mb-1"
+                                 style="width:110px;height:80px;object-fit:cover" />
+                            <div class="form-check d-inline-block">
+                                <input class="form-check-input" type="checkbox" name="SilinecekFotolar"
+                                       value="@f.Id" id="sil-@f.Id" />
+                                <label class="form-check-label small" for="sil-@f.Id">Sil</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="mb-3">
+                <label asp-for="YeniFotolar" class="form-label"></label>
+                <input asp-for="YeniFotolar" type="file" multiple class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <div class="form-text">En fazla 5 fotoğraf · JPG, PNG veya WEBP · her biri en fazla 3 MB</div>
+                <span asp-validation-for="YeniFotolar" class="text-danger"></span>
+            </div>
+
+            @if (!yeni)
+            {
+                <div class="form-check form-switch mb-3">
+                    <input asp-for="Aktif" class="form-check-input" />
+                    <label asp-for="Aktif" class="form-check-label"></label>
+                </div>
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">@(yeni ? "İlanı Yayınla" : "Kaydet")</button>
+                <a asp-action="@(yeni ? "Index" : "Detay")" asp-route-id="@Model.Id" class="btn btn-outline-secondary">İptal</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

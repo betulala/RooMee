@@ -1,0 +1,28 @@
+﻿@model List<Ilan>
+@{
+    ViewData["Title"] = "İlanlar";
+}
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">İlanlar</h1>
+    <a asp-action="Olustur" class="btn btn-primary">+ İlan ver</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Henüz ilan yok. İlk ilanı sen ver!</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+        @foreach (var ilan in Model)
+        {
+            <partial name="_IlanKarti" model="ilan" />
+        }
+    </div>
+}

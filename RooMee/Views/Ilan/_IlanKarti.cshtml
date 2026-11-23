@@ -1,0 +1,36 @@
+﻿@model Ilan
+@{
+    var kapak = Model.Fotolar.FirstOrDefault()?.Yol;
+}
+<div class="col">
+    <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.Id"
+       class="card h-100 text-decoration-none text-dark shadow-sm">
+        @if (kapak != null)
+        {
+            <img src="@kapak" class="card-img-top" style="height:180px;object-fit:cover" alt="" />
+        }
+        else
+        {
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center text-muted"
+                 style="height:180px">
+                Fotoğraf yok
+            </div>
+        }
+        <div class="card-body">
+            <h2 class="h6 card-title mb-1">@Model.Baslik</h2>
+            <p class="fw-bold text-primary mb-1">@Model.Kira.ToString("N0") TL / ay</p>
+            <p class="small text-muted mb-2">@Model.Ilce, @Model.Sehir · @Model.OdaTipi.GorunenAd()</p>
+            <p class="small mb-0">
+                @Model.Kullanici?.KisaAd
+                @if (Model.Kullanici?.OgrenciDogrulandi == true)
+                {
+                    <span class="badge bg-success">✓ Öğrenci</span>
+                }
+            </p>
+            @if (!Model.Aktif)
+            {
+                <span class="badge bg-secondary mt-2">Yayında değil</span>
+            }
+        </div>
+    </a>
+</div>

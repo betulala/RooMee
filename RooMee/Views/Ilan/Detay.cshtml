@@ -1,0 +1,121 @@
+﻿@model Ilan
+@{
+    ViewData["Title"] = Model.Baslik;
+    bool sahibi = ViewBag.Sahibi == true;
+    var sahip = Model.Kullanici!;
+}
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+@if (!Model.Aktif)
+{
+    <div class="alert alert-secondary">Bu ilan yayında değil; sadece sen görebiliyorsun.</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        @if (Model.Fotolar.Any())
+        {
+            <div id="ilanFotolari" class="carousel slide rounded overflow-hidden">
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.Fotolar.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@Model.Fotolar[i].Yol" class="d-block w-100"
+                                 style="height:380px;object-fit:cover" alt="İlan fotoğrafı @(i + 1)" />
+                        </div>
+                    }
+                </div>
+                @if (Model.Fotolar.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#ilanFotolari" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span><span class="visually-hidden">Önceki</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#ilanFotolari" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span><span class="visually-hidden">Sonraki</span>
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted"
+                 style="height:380px">
+                Fotoğraf yok
+            </div>
+        }
+
+        <h2 class="h5 mt-4">Açıklama</h2>
+        <p style="white-space:pre-line">@(string.IsNullOrWhiteSpace(Model.Aciklama) ? "Açıklama eklenmemiş." : Model.Aciklama)</p>
+    </div>
+
+    <div class="col-lg-5">
+        <h1 class="h3">@Model.Baslik</h1>
+        <p class="fs-4 fw-bold text-primary mb-1">@Model.Kira.ToString("N0") TL / ay</p>
+        <p class="text-muted">@Model.Ilce, @Model.Sehir · @Model.OdaTipi.GorunenAd()</p>
+
+        <div class="mb-3 d-flex flex-wrap gap-1">
+            @if (Model.SadeceOgrenci)
+            {
+                <span class="badge rounded-pill text-bg-light border">Öğrenci</span>
+            }
+            @if (Model.SigaraIcmeyen)
+            {
+                <span class="badge rounded-pill text-bg-light border">Sigara içmeyen</span>
+            }
+            @if (Model.Sessiz)
+            {
+                <span class="badge rounded-pill text-bg-light border">Sessiz</span>
+            }
+            @if (Model.EvcilHayvanKabul)
+            {
+                <span class="badge rounded-pill text-bg-light border">Evcil hayvan kabul</span>
+            }
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body d-flex align-items-center gap-3">
+                @if (!string.IsNullOrEmpty(sahip.Profil?.FotoYolu))
+                {
+                    <img src="@sahip.Profil.FotoYolu" alt="" class="rounded-circle"
+                         style="width:56px;height:56px;object-fit:cover" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;font-size:22px">
+                        @sahip.Ad.FirstOrDefault()
+                    </div>
+                }
+                <div>
+                    <div class="small text-muted">İlan sahibi</div>
+                    <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@sahip.Id" class="fw-semibold">@sahip.KisaAd</a>
+                    @if (sahip.OgrenciDogrulandi)
+                    {
+                        <div><span class="badge bg-success">✓ Doğrulanmış öğrenci</span></div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (sahibi)
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="Duzenle" asp-route-id="@Model.Id" class="btn btn-primary">Düzenle</a>
+                <form asp-action="Sil" asp-route-id="@Model.Id" method="post"
+                      onsubmit="return confirm('Bu ilanı silmek istediğine emin misin?');">
+                    <button type="submit" class="btn btn-outline-danger">Sil</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" disabled title="Yakında">İletişime geç</button>
+                <button class="btn btn-outline-secondary" disabled title="Yakında">Favorilere ekle</button>
+            </div>
+        }
+    </div>
+</div>
