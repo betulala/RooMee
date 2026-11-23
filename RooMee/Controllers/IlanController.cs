@@ -105,6 +105,8 @@ public class IlanController : Controller
         if (!ilan.Aktif && ilan.KullaniciId != benimId) return NotFound();
 
         ViewBag.Sahibi = ilan.KullaniciId == benimId;
+        ViewBag.Favoride = benimId != null &&
+    await _db.Favoriler.AnyAsync(f => f.KullaniciId == benimId && f.IlanId == id);
         return View(ilan);
     }
 

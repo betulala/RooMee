@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = Model.Baslik;
     bool sahibi = ViewBag.Sahibi == true;
+    bool favoride = ViewBag.Favoride == true;
     var sahip = Model.Kullanici!;
 }
 
@@ -114,7 +115,21 @@
         {
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" disabled title="Yakında">İletişime geç</button>
-                <button class="btn btn-outline-secondary" disabled title="Yakında">Favorilere ekle</button>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Favori" asp-action="Degistir" method="post">
+                        <input type="hidden" name="ilanId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit" class="btn w-100 @(favoride ? "btn-danger" : "btn-outline-danger")">
+                            @(favoride ? "♥ Favorilerden çıkar" : "♡ Favorilere ekle")
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path"
+                       class="btn btn-outline-danger">♡ Favorilere eklemek için giriş yap</a>
+                }
             </div>
         }
     </div>

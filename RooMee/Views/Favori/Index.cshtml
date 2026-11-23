@@ -1,0 +1,72 @@
+﻿@model List<Favori>
+@{
+    ViewData["Title"] = "Favorilerim";
+}
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+
+<h1 class="h3 mb-3">Favorilerim</h1>
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted py-5">
+        Henüz favori ilanın yok.<br />
+        <a asp-controller="Ilan" asp-action="Index" class="btn btn-outline-primary mt-3">İlanlara göz at</a>
+    </div>
+}
+else
+{
+    <div class="list-group shadow-sm">
+        @foreach (var fav in Model)
+        {
+            var ilan = fav.Ilan!;
+            var kapak = ilan.Fotolar.FirstOrDefault()?.Yol;
+
+            <div class="list-group-item d-flex flex-wrap align-items-center gap-3 py-3 @(ilan.Aktif ? "" : "opacity-75")">
+                @if (kapak != null)
+                {
+                    <img src="@kapak" alt="" class="rounded" style="width:120px;height:90px;object-fit:cover" />
+                }
+                else
+                {
+                    <div class="rounded bg-light border d-flex align-items-center justify-content-center text-muted small"
+                         style="width:120px;height:90px">
+                        Fotoğraf yok
+                    </div>
+                }
+
+                <div class="flex-grow-1">
+                    @if (ilan.Aktif)
+                    {
+                        <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@ilan.Id"
+                           class="fw-semibold text-decoration-none">@ilan.Baslik</a>
+                    }
+                    else
+                    {
+                        <span class="fw-semibold">@ilan.Baslik</span>
+                        <span class="badge bg-secondary ms-1">Yayından kaldırılmış</span>
+                    }
+                    <div class="small text-muted">
+                        @ilan.Ilce, @ilan.Sehir · @ilan.OdaTipi.GorunenAd() · @ilan.Kira.ToString("N0") TL / ay
+                    </div>
+                    <div class="small">
+                        @ilan.Kullanici?.KisaAd
+                        @if (ilan.Kullanici?.OgrenciDogrulandi == true)
+                        {
+                            <span class="badge bg-success">✓ Öğrenci</span>
+                        }
+                    </div>
+                </div>
+
+                <form asp-action="Degistir" method="post">
+                    <input type="hidden" name="ilanId" value="@ilan.Id" />
+                    <input type="hidden" name="returnUrl" value="/Favori" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Favoriden çıkar</button>
+                </form>
+            </div>
+        }
+    </div>
+}
