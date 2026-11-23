@@ -1,0 +1,99 @@
+@model List<Sikayet>
+@{
+    ViewData["Title"] = "Şikayet yönetimi";
+    SikayetDurumu secili = ViewBag.Durum;
+    var sayilar = (Dictionary<SikayetDurumu, int>)ViewBag.Sayilar;
+    var kisiSayilari = (Dictionary<string, int>)ViewBag.KullaniciSikayetSayisi;
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+
+<h1 class="h3 mb-3">Şikayet yönetimi</h1>
+
+<ul class="nav nav-tabs mb-3">
+    @foreach (var d in Enum.GetValues<SikayetDurumu>())
+    {
+        <li class="nav-item">
+            <a class="nav-link @(d == secili ? "active" : "")" asp-action="Yonetim" asp-route-durum="@d">
+                @d.GorunenAd()
+                <span class="badge @(d == SikayetDurumu.Beklemede && sayilar.GetValueOrDefault(d) > 0 ? "bg-danger" : "bg-secondary")">@sayilar.GetValueOrDefault(d)</span>
+            </a>
+        </li>
+    }
+</ul>
+
+@if (!Model.Any())
+{
+    <p class="text-muted py-4 text-center">Bu durumda şikayet yok.</p>
+}
+
+@foreach (var s in Model)
+{
+    var kisiSayisi = s.SikayetEdilenKullaniciId != null ? kisiSayilari.GetValueOrDefault(s.SikayetEdilenKullaniciId) : 0;
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+                <div>
+                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">@s.Neden</span>
+                    <span class="badge text-bg-light border">@(s.IlanId.HasValue ? "İlan" : "Kullanıcı")</span>
+                </div>
+                <small class="text-muted">@s.Tarih.ToLocalTime().ToString("d MMMM yyyy HH:mm", tr)</small>
+            </div>
+
+            <dl class="row small mb-2">
+                @if (s.Ilan != null)
+                {
+                    <dt class="col-sm-3">İlan</dt>
+                    <dd class="col-sm-9">
+                        <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@s.IlanId" target="_blank">@s.Ilan.Baslik</a>
+                        @if (!s.Ilan.Aktif) { <span class="badge bg-secondary ms-1">Yayında değil</span> }
+                    </dd>
+                }
+                <dt class="col-sm-3">Şikayet edilen</dt>
+                <dd class="col-sm-9">
+                    @if (s.SikayetEdilenKullanici != null)
+                    {
+                        <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@s.SikayetEdilenKullaniciId" target="_blank">@s.SikayetEdilenKullanici.Ad @s.SikayetEdilenKullanici.Soyad</a>
+                        <span class="text-muted">(@s.SikayetEdilenKullanici.Email)</span>
+                        @if (kisiSayisi > 1) { <span class="badge bg-warning text-dark ms-1">Toplam @kisiSayisi şikayet</span> }
+                    }
+                    else { <span class="text-muted">–</span> }
+                </dd>
+                <dt class="col-sm-3">Şikayet eden</dt>
+                <dd class="col-sm-9">@s.SikayetEden?.Ad @s.SikayetEden?.Soyad <span class="text-muted">(@s.SikayetEden?.Email)</span></dd>
+                @if (!string.IsNullOrWhiteSpace(s.Aciklama))
+                {
+                    <dt class="col-sm-3">Açıklama</dt>
+                    <dd class="col-sm-9" style="white-space:pre-line">@s.Aciklama</dd>
+                }
+            </dl>
+
+            <form asp-action="Karar" method="post" class="d-flex flex-wrap gap-2 align-items-center">
+                <input type="hidden" name="id" value="@s.Id" />
+                @if (s.Durum == SikayetDurumu.Beklemede)
+                {
+                    @if (s.Ilan?.Aktif == true)
+                    {
+                        <button type="submit" name="durum" value="@SikayetDurumu.Incelendi" class="btn btn-sm btn-danger"
+                                formaction="@Url.Action("Karar", new { ilaniKaldir = true })"
+                                onclick="return confirm('İlan yayından kaldırılacak. Emin misin?');">İlanı yayından kaldır</button>
+                    }
+                    <button type="submit" name="durum" value="@SikayetDurumu.Incelendi" class="btn btn-sm btn-success">İncelendi</button>
+                    <button type="submit" name="durum" value="@SikayetDurumu.Reddedildi" class="btn btn-sm btn-outline-secondary">Reddet</button>
+                    @if (s.SikayetEdilenKullaniciId != null)
+                    {
+                        <a asp-controller="Mesaj" asp-action="Yeni" asp-route-kullaniciId="@s.SikayetEdilenKullaniciId" class="btn btn-sm btn-outline-primary">Kişiye mesaj yaz</a>
+                    }
+                }
+                else
+                {
+                    <button type="submit" name="durum" value="@SikayetDurumu.Beklemede" class="btn btn-sm btn-outline-secondary">Tekrar beklemeye al</button>
+                }
+            </form>
+        </div>
+    </div>
+}

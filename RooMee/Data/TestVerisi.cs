@@ -253,6 +253,19 @@ public static class TestVerisi
             await db.SaveChangesAsync();
         }
 
+        // Şikayet yönetimini denemek için test yöneticisi
+        const string yoneticiEposta = "yonetici@roomee.test";
+        if (await kullanicilar.FindByEmailAsync(yoneticiEposta) == null)
+        {
+            var y = new ApplicationUser
+            {
+                UserName = yoneticiEposta, Email = yoneticiEposta, EmailConfirmed = true,
+                Ad = "Test", Soyad = "Yönetici", KvkkOnayTarihi = DateTime.UtcNow,
+            };
+            if ((await kullanicilar.CreateAsync(y, Sifre)).Succeeded) eklenenKisi++;
+        }
+        await Yoneticiler.YoneticiYapAsync(servisler, yoneticiEposta);
+
         Console.WriteLine($"Test verisi yüklendi: {eklenenKisi} yeni kullanıcı, {guncellenenKisi} güncellenen kullanıcı, {eklenenIlan} ilan.");
     }
 

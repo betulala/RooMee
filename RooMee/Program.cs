@@ -21,6 +21,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.Lockout.MaxFailedAccessAttempts = 5;     // 5 hatalı denemede
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10); // 10 dk kilit
 })
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<RooMee.Services.TurkceIdentityHatalari>();
 // Doğrulama ve form mesajları Türkçe (MVC sayfaları ve hesap sayfaları için)
@@ -44,6 +45,15 @@ var app = builder.Build();
 if (args.Contains("--test-verisi"))
 {
     await RooMee.Data.TestVerisi.YukleAsync(app.Services);
+    return;
+}
+
+// Bir kullanıcıyı yönetici yap: dotnet run --project RooMee -- --yonetici-yap ornek@mail.com
+var yoneticiIndex = Array.IndexOf(args, "--yonetici-yap");
+if (yoneticiIndex >= 0)
+{
+    var eposta = yoneticiIndex + 1 < args.Length ? args[yoneticiIndex + 1] : null;
+    await RooMee.Data.Yoneticiler.YoneticiYapAsync(app.Services, eposta);
     return;
 }
 

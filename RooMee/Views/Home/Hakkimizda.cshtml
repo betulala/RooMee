@@ -1,0 +1,128 @@
+@{
+    ViewData["Title"] = "Hakkımızda";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/kullanicilar.css" asp-append-version="true" />
+}
+
+<div class="ea">
+    <div class="ea-ust text-center mx-auto" style="max-width:760px">
+        <span class="ust-etiket">Hakkımızda</span>
+        <h1>Selçuk Üniversitesi Toplum Hizmeti Uygulamaları Projesi</h1>
+        <p>
+            RooMee, 18-30 yaş aralığındaki öğrencilerin ve genç yetişkinlerin barınma maliyetlerini
+            paylaşabilecekleri, güvenilir ve yaşam tarzı uyumuna dayalı bir ev arkadaşı bulma deneyimi
+            sunmayı hedefleyen bir öğrenci projesidir.
+        </p>
+    </div>
+
+    <!-- AMAÇ -->
+    <section class="bolum">
+        <div class="deger-izgara">
+            <div class="deger-kart">
+                <h3>🎯 Amacımız</h3>
+                <p>
+                    Öğrencilik durumu doğrulanmış ve yaşam tarzı olarak uyumlu ev arkadaşlarının güvenli, ücretsiz
+                    ve kısa sürede bulunmasını sağlamak; barınma sorunlarını ve ev içi anlaşmazlıkları azaltmaya katkı sunmak.
+                </p>
+            </div>
+            <div class="deger-kart">
+                <h3>🧭 Hedef kitlemiz</h3>
+                <p>
+                    Başta üniversite öğrencileri ve iş hayatına yeni atılan genç yetişkinler olmak üzere, ev arkadaşı arayan
+                    veya mevcut konutunu paylaşmak isteyen 18-30 yaş aralığındaki bireyler. Pilot aşamada 20-50 kişiye
+                    ulaşılması hedeflenmektedir.
+                </p>
+            </div>
+            <div class="deger-kart">
+                <h3>🌍 Sürdürülebilir Kalkınma Amacı</h3>
+                <p>
+                    Proje, SKA 11 "Sürdürülebilir Şehirler ve Topluluklar" hedefinin 11.1 alt hedefiyle ilişkilendirilmiştir:
+                    herkes için yeterli, güvenli ve erişilebilir barınmaya destek olmak.
+                </p>
+            </div>
+            <div class="deger-kart">
+                <h3>🛠️ Kullanılan teknolojiler</h3>
+                <p>
+                    ASP.NET Core MVC (C#) · Entity Framework Core · Microsoft SQL Server · ASP.NET Core Identity ·
+                    Bootstrap · Sürüm kontrolü: Git &amp; GitHub · Prototipleme: HTML/CSS ve Figma.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- EKİP -->
+    <section class="bolum yuzey">
+        <div class="bolum-baslik">
+            <span class="ust-etiket">Proje ekibi</span>
+            <h2>Bilgisayar Mühendisliği Bölümü Öğrencileri</h2>
+        </div>
+        <div class="ekip-izgara">
+            <div class="ekip-kart">
+                <div class="avatar">ZD</div>
+                <h3>Zehra Demir</h3>
+                <span>Koordinatör · Proje takibi ve raporlama</span>
+            </div>
+            <div class="ekip-kart">
+                <div class="avatar alt">HP</div>
+                <h3>Hayrunisa Polat</h3>
+                <span>Frontend · Arayüz geliştirme</span>
+            </div>
+            <div class="ekip-kart">
+                <div class="avatar">BA</div>
+                <h3>Betül Aladağ</h3>
+                <span>Backend · Uygulama ve iş mantığı</span>
+            </div>
+            <div class="ekip-kart">
+                <div class="avatar alt">SA</div>
+                <h3>Sariye Arıcı</h3>
+                <span>Veritabanı, test ve entegrasyon</span>
+            </div>
+        </div>
+        <p class="text-center mt-4 mb-0">Proje Danışmanı: <strong>Prof. Dr. Nurettin Doğan</strong></p>
+    </section>
+
+    <!-- KVKK -->
+    <section class="bolum" id="kvkk">
+        <div class="bolum-baslik">
+            <span class="ust-etiket">Gizlilik &amp; KVKK</span>
+            <h2>Kişisel verilerinizi nasıl koruyoruz?</h2>
+            <p>Veriler, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında işlenir.</p>
+        </div>
+        <ul class="kvkk-liste">
+            <li>Kayıt sırasında <a asp-action="Privacy">aydınlatma metni</a> sunulur ve açık rıza alınır.</li>
+            <li>Şifreler özetlenerek (hash) saklanır; tüm iletişim HTTPS üzerinden yapılır.</li>
+            <li>E-posta ve telefon numaraları diğer kullanıcılara gösterilmez; soyadı kısaltılarak gösterilir (ör. "Ayşe K.").</li>
+            <li>En az veri ilkesi uygulanır; T.C. kimlik no, açık adres gibi bilgiler istenmez.</li>
+            <li>Kullanıcılar hesabını ve tüm verilerini diledikleri zaman silebilir.</li>
+            <li>İhtiyaç analizi ve memnuniyet anketleri anonim olarak toplanır.</li>
+        </ul>
+    </section>
+
+    <!-- RİSKLER -->
+    <section class="bolum yuzey" id="risk">
+        <div class="bolum-baslik">
+            <span class="ust-etiket">Güvenlik önlemleri</span>
+            <h2>Olası riskler ve aldığımız önlemler</h2>
+        </div>
+        <div class="deger-izgara">
+            <div class="deger-kart">
+                <h3>🪪 Sahte profil / kapora dolandırıcılığı</h3>
+                <p>.edu.tr öğrencilik doğrulaması, şikâyet sistemi ve güvenlik uyarılarıyla önlenmeye çalışılır.</p>
+            </div>
+            <div class="deger-kart">
+                <h3>🔐 Kişisel veri sızıntısı</h3>
+                <p>KVKK uyumu ve şifreleme (HTTPS, hash'lenmiş şifreler) ile veri güvenliği sağlanır.</p>
+            </div>
+            <div class="deger-kart">
+                <h3>📋 Düşük katılım riski</h3>
+                <p>Kısa anketler, gönüllü katılım çağrıları ve öğrenci topluluklarından duyuru desteğiyle katılım artırılır.</p>
+            </div>
+            <div class="deger-kart">
+                <h3>⏱️ Kapsam / zaman riski</h3>
+                <p>Öncelik kayıt, ilan oluşturma, listeleme ve filtrelemeye verildi; mesajlaşma ve şikâyet sistemi de eklendi.</p>
+            </div>
+        </div>
+    </section>
+</div>

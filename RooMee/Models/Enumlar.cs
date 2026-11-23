@@ -11,9 +11,9 @@ public enum OdaTipi
 
 public enum SikayetDurumu
 {
-    Beklemede,
-    Incelendi,
-    Reddedildi
+    [Display(Name = "Beklemede")] Beklemede,
+    [Display(Name = "İncelendi")] Incelendi,
+    [Display(Name = "Reddedildi")] Reddedildi
 }
 
 // ---------- Ev arkadaşı profili ----------

@@ -25,6 +25,14 @@ dotnet run --project RooMee -- --test-verisi
 ```
 Test hesaplarının e-postaları `ad@roomee.test` biçimindedir (ör. `mert@roomee.test`, `selin@roomee.test`); şifreleri `Data/TestVerisi.cs` dosyasında yazıyor. Komut tekrar çalıştırılırsa aynı kullanıcıları ikinci kez eklemez.
 
+### Yönetici (şikayet yönetimi)
+
+Şikayetleri inceleyen kullanıcıların "Yonetici" rolü olmalı. Bir hesabı yönetici yapmak için (uygulama kapalıyken):
+```
+dotnet run --project RooMee -- --yonetici-yap ornek@mail.com
+```
+Sonra o hesapla çıkış yapıp tekrar giriş yapınca menüde **Şikayetler** görünür. Test verisi yüklendiyse `yonetici@roomee.test` hesabı zaten yöneticidir.
+
 ## Çalışma düzeni
 
 `master` her zaman çalışan sürümdür. Kimse doğrudan `master`'a göndermez.
@@ -57,5 +65,7 @@ Visual Studio çakışan dosyaları gösterir. **Merge** ekranında iki tarafı 
 - İlan oluşturma, düzenleme, listeleme, fotoğraf yükleme
 - İlan filtreleme ve sayfalama, İlanlarım sayfası
 - Favoriler, mesajlaşma
+- Şikayet sistemi (ilan / kullanıcı bildirme) ve yönetici inceleme sayfası
+- Hakkımızda ve KVKK aydınlatma metni
 - Ev Arkadaşları: profil listesi, gelişmiş filtreler ve uyum yüzdesi
   (tasarım ve filtre mantığı ToplumaHizmetVatanaHizmettir reposundaki `kullanicilar.html` prototipinden uyarlandı)

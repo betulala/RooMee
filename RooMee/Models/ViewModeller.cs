@@ -209,6 +209,32 @@ public class KullaniciKartViewModel
     public int? Uyum { get; set; }
 }
 
+public class SikayetFormViewModel
+{
+    public static readonly string[] Nedenler =
+    {
+        "Sahte ilan veya profil",
+        "Kapora / önden ödeme istiyor",
+        "Yanıltıcı bilgi veya fotoğraf",
+        "Uygunsuz içerik veya dil",
+        "Taciz veya rahatsız edici mesaj",
+        "Diğer"
+    };
+
+    public int? IlanId { get; set; }
+    public string? KullaniciId { get; set; }
+
+    [Required(ErrorMessage = "Bir şikayet nedeni seç."), StringLength(100), Display(Name = "Şikayet nedeni")]
+    public string Neden { get; set; } = "";
+
+    [StringLength(1000), Display(Name = "Açıklama (isteğe bağlı)")]
+    public string? Aciklama { get; set; }
+
+    // Formda gösterilecek bilgiler
+    public string? IlanBaslik { get; set; }
+    public string? KullaniciAd { get; set; }
+}
+
 public class KonusmaOzetViewModel
 {
     public Konusma Konusma { get; set; } = null!;

@@ -203,10 +203,11 @@
                 <div class="card shadow-sm mb-3">
                     <div class="card-body">
                         <h2 class="h6">Güvenlik hatırlatması</h2>
-                        <p class="small mb-0">
+                        <p class="small">
                             Kapora veya önden ödeme isteyen kişileri bildir. Görüşmeden önce karşı tarafın
                             doğrulama rozetini kontrol et, kişisel ve finansal bilgilerini paylaşma.
                         </p>
+                        <a asp-controller="Sikayet" asp-action="Olustur" asp-route-kullaniciId="@Model.Id" class="btn btn-sm btn-outline-danger">⚑ Bu kullanıcıyı şikayet et</a>
                     </div>
                 </div>
             }

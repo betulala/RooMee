@@ -21,7 +21,7 @@
 
 /* ---------- Sayfa başlığı ---------- */
 .ea .ea-ust { margin-bottom: 20px; }
-.ea .ea-ust .ust-etiket {
+.ea .ust-etiket {
   font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ea-accent-dark);
 }
 .ea .ea-ust h1 { font-size: 1.7rem; font-weight: 800; margin: 4px 0 6px; }
@@ -154,6 +154,39 @@
 .ea .durum.ok { background: var(--ea-primary-light); color: var(--ea-primary-dark); }
 .ea .durum.mid { background: #fff4d6; color: #8a6200; }
 .ea .durum.low { background: #ffe9e1; color: var(--ea-accent-dark); }
+
+/* ---------- Hakkımızda ---------- */
+.ea .bolum { padding: 36px 0; }
+.ea .bolum.yuzey { background: var(--ea-surface); border-radius: var(--ea-radius-md); padding: 36px 24px; }
+.ea .bolum-baslik { text-align: center; max-width: 720px; margin: 0 auto 24px; }
+.ea .bolum-baslik h2 { font-size: 1.5rem; font-weight: 800; margin: 4px 0 6px; }
+.ea .bolum-baslik p { color: var(--ea-muted); margin: 0; }
+.ea .deger-izgara { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.ea .deger-kart {
+  background: var(--ea-surface); border: 1px solid var(--ea-border); border-radius: var(--ea-radius-md); padding: 20px;
+}
+.ea .bolum.yuzey .deger-kart { background: var(--ea-bg); }
+.ea .deger-kart h3 { font-size: 1.02rem; font-weight: 700; margin: 0 0 8px; }
+.ea .deger-kart p { color: var(--ea-muted); margin: 0; font-size: .93rem; }
+.ea .ekip-izgara { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.ea .ekip-kart {
+  text-align: center; background: var(--ea-bg); border: 1px solid var(--ea-border);
+  border-radius: var(--ea-radius-md); padding: 22px 14px;
+}
+.ea .ekip-kart .avatar { margin: 0 auto 10px; width: 56px; height: 56px; }
+.ea .ekip-kart h3 { font-size: 1rem; font-weight: 700; margin: 0 0 4px; }
+.ea .ekip-kart span { font-size: .84rem; color: var(--ea-muted); }
+.ea .kvkk-liste { max-width: 720px; margin: 0 auto; padding: 0; list-style: none; }
+.ea .kvkk-liste li { padding: 10px 0 10px 30px; position: relative; border-bottom: 1px solid var(--ea-border); }
+.ea .kvkk-liste li:last-child { border-bottom: none; }
+.ea .kvkk-liste li::before { content: "✓"; position: absolute; left: 4px; color: var(--ea-primary); font-weight: 800; }
+
+@media (max-width: 900px) {
+  .ea .ekip-izgara { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .ea .deger-izgara { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 900px) {
   .ea .ea-yerlesim { grid-template-columns: 1fr; }

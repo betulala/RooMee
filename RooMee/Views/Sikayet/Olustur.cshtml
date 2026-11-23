@@ -1,0 +1,60 @@
+@model SikayetFormViewModel
+@{
+    ViewData["Title"] = "Şikayet et";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <h1 class="h3 mb-1">Şikayet et</h1>
+        <p class="text-muted">
+            @if (Model.IlanId.HasValue)
+            {
+                <span>İlan: <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@Model.IlanId">@Model.IlanBaslik</a> (@Model.KullaniciAd)</span>
+            }
+            else
+            {
+                <span>Kullanıcı: <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@Model.KullaniciId">@Model.KullaniciAd</a></span>
+            }
+        </p>
+
+        <div class="alert alert-warning small">
+            Kapora ya da önden ödeme isteyen, sahte olduğunu düşündüğün veya seni rahatsız eden kişileri bildir.
+            Şikayetin karşı tarafa gösterilmez, sadece RooMee ekibi görür.
+        </div>
+
+        <form asp-action="Olustur" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IlanId" />
+            <input type="hidden" asp-for="KullaniciId" />
+
+            <fieldset class="mb-3">
+                <legend class="form-label fs-6">@Html.DisplayNameFor(m => m.Neden)</legend>
+                @for (int i = 0; i < SikayetFormViewModel.Nedenler.Length; i++)
+                {
+                    var n = SikayetFormViewModel.Nedenler[i];
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Neden" id="neden-@i" value="@n" checked="@(Model.Neden == n)" required />
+                        <label class="form-check-label" for="neden-@i">@n</label>
+                    </div>
+                }
+                <span asp-validation-for="Neden" class="text-danger"></span>
+            </fieldset>
+
+            <div class="mb-3">
+                <label asp-for="Aciklama" class="form-label"></label>
+                <textarea asp-for="Aciklama" class="form-control" rows="4" maxlength="1000"
+                          placeholder="Ne oldu? Mesaj içeriği, tarih gibi ayrıntılar incelemeyi hızlandırır."></textarea>
+                <span asp-validation-for="Aciklama" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Şikayeti gönder</button>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">Vazgeç</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

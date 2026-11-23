@@ -140,6 +140,9 @@
                        class="btn btn-outline-danger">♡ Favorilere eklemek için giriş yap</a>
                 }
             </div>
+            <div class="text-end mt-2">
+                <a asp-controller="Sikayet" asp-action="Olustur" asp-route-ilanId="@Model.Id" class="small link-secondary">⚑ Bu ilanı şikayet et</a>
+            </div>
         }
     </div>
 </div>
