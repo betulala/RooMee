@@ -1,0 +1,122 @@
+@model YonetimOzetViewModel
+@{
+    ViewData["Title"] = "Yönetici paneli";
+    ViewData["YonetimSekme"] = "ozet";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    var enCok = Math.Max(1, Model.Gunluk.Max(g => Math.Max(g.Kayit, g.Ilan)));
+}
+
+<partial name="_Sekmeler" />
+
+<!-- Sayılar -->
+<div class="row g-3 mb-4">
+    @foreach (var (baslik, deger, alt, adres) in new (string, int, string, string)[]
+    {
+        ("Kullanıcı", Model.KullaniciSayisi, $"son 7 günde +{Model.YeniKullanici7Gun}", Url.Action("Kullanicilar")!),
+        ("Doğrulanmış öğrenci", Model.DogrulanmisOgrenci, $"%{(Model.KullaniciSayisi == 0 ? 0 : Model.DogrulanmisOgrenci * 100 / Model.KullaniciSayisi)} oranında", Url.Action("Kullanicilar", new { durum = "dogrulanmis" })!),
+        ("Yayındaki ilan", Model.AktifIlan, $"toplam {Model.ToplamIlan} · son 7 günde +{Model.YeniIlan7Gun}", Url.Action("Ilanlar", new { durum = "yayinda" })!),
+        ("Bekleyen şikayet", Model.BekleyenSikayet, "incelenmeyi bekliyor", Url.Action("Yonetim", "Sikayet")!),
+        ("Askıdaki hesap", Model.AskidakiKullanici, "giriş yapamıyor", Url.Action("Kullanicilar", new { durum = "askida" })!),
+        ("Mesaj (7 gün)", Model.Mesaj7Gun, $"{Model.KayitliArama} kayıtlı arama", "#"),
+    })
+    {
+        <div class="col-6 col-lg-4 col-xl-2">
+            <a href="@adres" class="card shadow-sm h-100 text-decoration-none text-reset">
+                <div class="card-body">
+                    <div class="small text-muted fw-semibold">@baslik</div>
+                    <div class="fs-3 fw-bold" style="color:@(baslik == "Bekleyen şikayet" && deger > 0 ? "var(--rm-accent-dark)" : "var(--rm-primary-dark)")">@deger.ToString("N0", tr)</div>
+                    <div class="small text-muted">@alt</div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<!-- Son 14 gün -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <h2 class="h6 mb-0">Son 14 gün</h2>
+            <div class="small">
+                <span class="me-3"><span class="d-inline-block rounded-1 me-1" style="width:10px;height:10px;background:var(--rm-primary)"></span>Yeni kullanıcı</span>
+                <span><span class="d-inline-block rounded-1 me-1" style="width:10px;height:10px;background:var(--rm-accent)"></span>Yeni ilan</span>
+            </div>
+        </div>
+        <div class="d-flex align-items-end gap-2" style="height:140px" role="img"
+             aria-label="Son 14 günde günlük yeni kullanıcı ve ilan sayıları">
+            @foreach (var g in Model.Gunluk)
+            {
+                <div class="flex-fill d-flex flex-column align-items-center justify-content-end h-100"
+                     title="@g.Gun.ToString("d MMMM", tr): @g.Kayit kullanıcı, @g.Ilan ilan">
+                    <div class="d-flex align-items-end gap-1 w-100 justify-content-center" style="height:110px">
+                        <div style="width:40%;max-width:14px;height:@(g.Kayit * 100 / enCok)%;min-height:2px;background:var(--rm-primary);border-radius:3px 3px 0 0"></div>
+                        <div style="width:40%;max-width:14px;height:@(g.Ilan * 100 / enCok)%;min-height:2px;background:var(--rm-accent);border-radius:3px 3px 0 0"></div>
+                    </div>
+                    <small class="text-muted mt-1" style="font-size:.7rem">@g.Gun.ToString("dd.MM")</small>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Son kayıtlar -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h6 mb-0">Son kayıtlar</h2>
+                    <a asp-action="Kullanicilar" class="small">Tümü →</a>
+                </div>
+                <table class="table table-sm align-middle mb-0">
+                    <tbody>
+                        @foreach (var u in Model.SonKayitlar)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@u.Id" class="fw-semibold">@u.Ad @u.Soyad</a>
+                                    <div class="small text-muted">@u.Email</div>
+                                </td>
+                                <td class="text-end">
+                                    @if (u.AskiyaAlindi) { <span class="badge bg-danger">Askıda</span> }
+                                    else if (!u.EmailConfirmed) { <span class="badge text-bg-light border">E-posta onaysız</span> }
+                                    else if (u.OgrenciDogrulandi) { <span class="badge bg-success">Öğrenci ✓</span> }
+                                    <div class="small text-muted">@u.KayitTarihi.ToLocalTime().ToString("d MMM yyyy", tr)</div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Son ilanlar -->
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h6 mb-0">Son ilanlar</h2>
+                    <a asp-action="Ilanlar" class="small">Tümü →</a>
+                </div>
+                <table class="table table-sm align-middle mb-0">
+                    <tbody>
+                        @foreach (var i in Model.SonIlanlar)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@i.Id" class="fw-semibold">@i.Baslik</a>
+                                    <div class="small text-muted">@i.Ilce, @i.Sehir · @i.Kullanici?.Ad @i.Kullanici?.Soyad</div>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge @(i.Aktif ? "bg-success" : "text-bg-light border")">@(i.Aktif ? "Yayında" : "Kapalı")</span>
+                                    <div class="small text-muted">@i.OlusturmaTarihi.ToLocalTime().ToString("d MMM yyyy", tr)</div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

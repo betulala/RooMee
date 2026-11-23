@@ -172,6 +172,16 @@ namespace RooMee.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("AskiyaAlindi")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("AskiyaAlinmaTarihi")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AskiyaAlmaNedeni")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");

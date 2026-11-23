@@ -70,6 +70,9 @@ public static class IlanFiltresi
     // Sadece yayındaki ilanlara uygulanmalı (çağıran taraf Aktif filtresini ekler)
     public static IQueryable<Ilan> Uygula(IQueryable<Ilan> q, IlanAramaKriteri f)
     {
+        // Askıya alınmış kullanıcıların ilanları hiçbir aramada çıkmaz
+        q = q.Where(i => !i.Kullanici!.AskiyaAlindi);
+
         if (!string.IsNullOrWhiteSpace(f.Sehir))
         {
             var sehir = f.Sehir.Trim();

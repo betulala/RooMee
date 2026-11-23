@@ -22,6 +22,12 @@ public class ApplicationUser : IdentityUser
     // Yeni mesaj, kayıtlı arama uyarısı gibi e-posta bildirimleri
     public bool EpostaBildirim { get; set; } = true;
 
+    // Yönetici tarafından askıya alınan hesap giriş yapamaz; ilanları ve profili gizlenir
+    public bool AskiyaAlindi { get; set; }
+    public DateTime? AskiyaAlinmaTarihi { get; set; }
+    [StringLength(200)]
+    public string? AskiyaAlmaNedeni { get; set; }
+
     [NotMapped]
     public string KisaAd => string.IsNullOrEmpty(Soyad) ? Ad : $"{Ad} {Soyad[0]}.";
 

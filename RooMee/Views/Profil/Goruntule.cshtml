@@ -27,6 +27,13 @@
     {
         <div class="alert alert-success">@mesaj</div>
     }
+    @if (Model.AskiyaAlindi && !kendi)
+    {
+        <div class="alert alert-danger">
+            Bu hesap askıya alınmış@(Model.AskiyaAlinmaTarihi.HasValue ? $" ({Model.AskiyaAlinmaTarihi.Value.ToLocalTime():d MMMM yyyy})" : "").
+            @Model.AskiyaAlmaNedeni Sadece yöneticiler görebilir.
+        </div>
+    }
 
     <div class="row g-4 justify-content-center">
         <!-- Sol: profil bilgileri -->

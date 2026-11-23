@@ -1,0 +1,22 @@
+@inject RooMee.Data.ApplicationDbContext Db
+@using Microsoft.EntityFrameworkCore
+@{
+    var aktif = ViewData["YonetimSekme"] as string;
+    var bekleyen = await Db.Sikayetler.CountAsync(s => s.Durum == SikayetDurumu.Beklemede);
+}
+<div class="sayfa-ust">
+    <span class="ust-etiket">Yönetim</span>
+    <h1>Yönetici paneli</h1>
+    <p>Kullanıcıları, ilanları ve şikayetleri buradan yönet.</p>
+</div>
+<ul class="nav nav-pills mb-4 gap-1">
+    <li class="nav-item"><a class="nav-link @(aktif == "ozet" ? "active" : "")" asp-controller="Yonetim" asp-action="Index">📊 Genel bakış</a></li>
+    <li class="nav-item"><a class="nav-link @(aktif == "kullanicilar" ? "active" : "")" asp-controller="Yonetim" asp-action="Kullanicilar">👥 Kullanıcılar</a></li>
+    <li class="nav-item"><a class="nav-link @(aktif == "ilanlar" ? "active" : "")" asp-controller="Yonetim" asp-action="Ilanlar">🏠 İlanlar</a></li>
+    <li class="nav-item">
+        <a class="nav-link @(aktif == "sikayetler" ? "active" : "")" asp-controller="Sikayet" asp-action="Yonetim">
+            ⚑ Şikayetler
+            @if (bekleyen > 0) { <span class="badge rounded-pill" style="background:var(--rm-accent)">@bekleyen</span> }
+        </a>
+    </li>
+</ul>

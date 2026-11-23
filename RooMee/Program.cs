@@ -22,6 +22,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10); // 10 dk kilit
 })
 .AddRoles<IdentityRole>()
+.AddSignInManager<RooMee.Services.RooMeeGirisYoneticisi>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddErrorDescriber<RooMee.Services.TurkceIdentityHatalari>();
 // Doğrulama ve form mesajları Türkçe (MVC sayfaları ve hesap sayfaları için)
@@ -39,6 +40,8 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = turkce;
 
 builder.Services.Configure<RooMee.Services.EpostaAyarlari>(builder.Configuration.GetSection("Eposta"));
 builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, RooMee.Services.SmtpEpostaGonderici>();
+// Oturum çerezleri dakikada bir kontrol edilir; askıya alınan ya da silinen hesabın oturumu hemen kapanır
+builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
 builder.Services.AddScoped<RooMee.Services.Bildirimci>();
 builder.Services.AddScoped<RooMee.Services.AramaUyarilari>();
 var app = builder.Build();

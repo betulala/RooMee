@@ -214,6 +214,31 @@ public class KullaniciKartViewModel
     public int PuanSayisi { get; set; }
 }
 
+public class YonetimOzetViewModel
+{
+    public int KullaniciSayisi { get; set; }
+    public int YeniKullanici7Gun { get; set; }
+    public int DogrulanmisOgrenci { get; set; }
+    public int AskidakiKullanici { get; set; }
+    public int AktifIlan { get; set; }
+    public int ToplamIlan { get; set; }
+    public int YeniIlan7Gun { get; set; }
+    public int BekleyenSikayet { get; set; }
+    public int Mesaj7Gun { get; set; }
+    public int KayitliArama { get; set; }
+    public List<ApplicationUser> SonKayitlar { get; set; } = new();
+    public List<Ilan> SonIlanlar { get; set; } = new();
+    public List<(DateTime Gun, int Kayit, int Ilan)> Gunluk { get; set; } = new();
+}
+
+public class YonetimKullaniciSatiri
+{
+    public ApplicationUser Kullanici { get; set; } = null!;
+    public int IlanSayisi { get; set; }
+    public int SikayetSayisi { get; set; }
+    public bool Yonetici { get; set; }
+}
+
 public class KayitliAramaOzetViewModel
 {
     public KayitliArama Arama { get; set; } = null!;

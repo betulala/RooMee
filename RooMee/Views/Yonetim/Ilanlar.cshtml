@@ -1,0 +1,93 @@
+@model List<Ilan>
+@{
+    ViewData["Title"] = "İlanlar - Yönetim";
+    ViewData["YonetimSekme"] = "ilanlar";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    string? q = ViewBag.Q;
+    string? durum = ViewBag.Durum;
+    int sayfa = ViewBag.Sayfa, toplamSayfa = ViewBag.ToplamSayfa;
+    var sikayetler = (Dictionary<int, int>)ViewBag.SikayetSayilari;
+    var buAdres = Context.Request.Path + Context.Request.QueryString;
+}
+
+<partial name="_Sekmeler" />
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+
+<form method="get" class="form-kart p-3 mb-3 d-flex flex-wrap gap-2 align-items-center">
+    <input type="search" name="q" value="@q" class="form-control" style="max-width:320px" placeholder="Başlık, şehir, ilçe veya e-posta ara" aria-label="İlan ara" />
+    <select name="durum" class="form-select" style="max-width:220px" aria-label="Duruma göre filtrele">
+        <option value="" selected="@string.IsNullOrEmpty(durum)">Tüm ilanlar</option>
+        <option value="yayinda" selected="@(durum == "yayinda")">Yayında</option>
+        <option value="kapali" selected="@(durum == "kapali")">Yayında değil</option>
+        <option value="sikayetli" selected="@(durum == "sikayetli")">Şikayet edilmiş</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Ara</button>
+    <span class="ms-auto small text-muted">@ViewBag.Toplam ilan</span>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr class="small text-muted">
+                    <th class="ps-3">İlan</th>
+                    <th>İlan sahibi</th>
+                    <th class="text-end">Kira</th>
+                    <th class="text-center">Şikayet</th>
+                    <th>Tarih</th>
+                    <th class="text-end pe-3">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in Model)
+                {
+                    var sikayet = sikayetler.GetValueOrDefault(i.Id);
+                    <tr>
+                        <td class="ps-3">
+                            <a asp-controller="Ilan" asp-action="Detay" asp-route-id="@i.Id" class="fw-semibold">@i.Baslik</a>
+                            <span class="badge ms-1 @(i.Aktif ? "bg-success" : "text-bg-light border")">@(i.Aktif ? "Yayında" : "Kapalı")</span>
+                            <div class="small text-muted">@i.Ilce, @i.Sehir · @i.OdaTipi.GorunenAd()</div>
+                        </td>
+                        <td>
+                            <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@i.KullaniciId">@i.Kullanici?.Ad @i.Kullanici?.Soyad</a>
+                            @if (i.Kullanici?.AskiyaAlindi == true) { <span class="badge bg-danger ms-1">Askıda</span> }
+                        </td>
+                        <td class="text-end">@i.Kira.ToString("N0", tr)₺</td>
+                        <td class="text-center">
+                            @if (sikayet > 0) { <a asp-controller="Sikayet" asp-action="Yonetim" class="badge bg-warning text-dark text-decoration-none">@sikayet</a> } else { <span class="text-muted">0</span> }
+                        </td>
+                        <td class="small text-muted">@i.OlusturmaTarihi.ToLocalTime().ToString("d MMM yyyy", tr)</td>
+                        <td class="text-end pe-3">
+                            <form asp-action="IlanYayini" method="post" class="d-inline"
+                                  onsubmit="return confirm('@(i.Aktif ? "İlan yayından kaldırılsın mı?" : "İlan tekrar yayına alınsın mı?")');">
+                                <input type="hidden" name="id" value="@i.Id" />
+                                <input type="hidden" name="returnUrl" value="@buAdres" />
+                                <button type="submit" class="btn btn-sm @(i.Aktif ? "btn-outline-danger" : "btn-outline-primary")">
+                                    @(i.Aktif ? "Yayından kaldır" : "Yayına al")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (toplamSayfa > 1)
+{
+    <nav aria-label="Sayfalar">
+        <ul class="pagination justify-content-center mt-3">
+            @for (int p = 1; p <= toplamSayfa; p++)
+            {
+                <li class="page-item @(p == sayfa ? "active" : "")">
+                    <a class="page-link" asp-action="Ilanlar" asp-route-q="@q" asp-route-durum="@durum" asp-route-sayfa="@p">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

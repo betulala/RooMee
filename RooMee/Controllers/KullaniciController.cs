@@ -28,7 +28,7 @@ public class KullaniciController : Controller
         // Listede sadece "Listede nasıl görüneyim?" sorusunu cevaplamış ve şehrini yazmış profiller görünür
         var q = _db.Users
             .Include(u => u.Profil)
-            .Where(u => u.Profil != null && u.Profil.AramaTuru != null && u.Profil.Sehir != null);
+            .Where(u => !u.AskiyaAlindi && u.Profil != null && u.Profil.AramaTuru != null && u.Profil.Sehir != null);
         if (benimId != null) q = q.Where(u => u.Id != benimId);
 
         // Filtre seçenekleri (kişi sayılarıyla), filtrelerden önce hesaplanır

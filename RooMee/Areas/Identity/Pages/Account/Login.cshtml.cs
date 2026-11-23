@@ -110,7 +110,10 @@ public class LoginModel : PageModel
             }
             if (result.IsNotAllowed)
             {
-                ModelState.AddModelError(string.Empty, "Giriş yapmadan önce e-posta adresini onaylamalısın.");
+                var k = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                ModelState.AddModelError(string.Empty, k?.AskiyaAlindi == true
+                    ? "Hesabın askıya alındı. Bir yanlışlık olduğunu düşünüyorsan bizimle iletişime geç."
+                    : "Giriş yapmadan önce e-posta adresini onaylamalısın.");
                 return Page();
             }
             if (result.IsLockedOut)

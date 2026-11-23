@@ -1,0 +1,112 @@
+@model List<YonetimKullaniciSatiri>
+@{
+    ViewData["Title"] = "Kullanıcılar - Yönetim";
+    ViewData["YonetimSekme"] = "kullanicilar";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    string? q = ViewBag.Q;
+    string? durum = ViewBag.Durum;
+    int sayfa = ViewBag.Sayfa, toplamSayfa = ViewBag.ToplamSayfa;
+    var buAdres = Context.Request.Path + Context.Request.QueryString;
+}
+
+<partial name="_Sekmeler" />
+
+@if (TempData["Mesaj"] is string mesaj)
+{
+    <div class="alert alert-success">@mesaj</div>
+}
+
+<form method="get" class="form-kart p-3 mb-3 d-flex flex-wrap gap-2 align-items-center">
+    <input type="search" name="q" value="@q" class="form-control" style="max-width:320px" placeholder="Ad, soyad veya e-posta ara" aria-label="Kullanıcı ara" />
+    <select name="durum" class="form-select" style="max-width:220px" aria-label="Duruma göre filtrele">
+        <option value="" selected="@string.IsNullOrEmpty(durum)">Tüm kullanıcılar</option>
+        <option value="dogrulanmis" selected="@(durum == "dogrulanmis")">Doğrulanmış öğrenciler</option>
+        <option value="onaysiz" selected="@(durum == "onaysiz")">E-postası onaysız</option>
+        <option value="askida" selected="@(durum == "askida")">Askıya alınmış</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Ara</button>
+    <span class="ms-auto small text-muted">@ViewBag.Toplam kullanıcı</span>
+</form>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr class="small text-muted">
+                    <th class="ps-3">Kullanıcı</th>
+                    <th>Durum</th>
+                    <th class="text-center">İlan</th>
+                    <th class="text-center">Şikayet</th>
+                    <th>Kayıt</th>
+                    <th class="text-end pe-3">İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    var u = s.Kullanici;
+                    <tr class="@(u.AskiyaAlindi ? "table-danger" : "")">
+                        <td class="ps-3">
+                            <a asp-controller="Profil" asp-action="Goruntule" asp-route-id="@u.Id" class="fw-semibold">@u.Ad @u.Soyad</a>
+                            @if (s.Yonetici) { <span class="badge text-bg-dark ms-1">Yönetici</span> }
+                            <div class="small text-muted">@u.Email</div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                @if (u.AskiyaAlindi)
+                                {
+                                    <span class="badge bg-danger" title="@u.AskiyaAlmaNedeni">Askıda</span>
+                                }
+                                @if (u.OgrenciDogrulandi) { <span class="badge bg-success">Öğrenci ✓</span> }
+                                @if (!u.EmailConfirmed) { <span class="badge text-bg-light border">E-posta onaysız</span> }
+                            </div>
+                            @if (u.AskiyaAlindi && !string.IsNullOrEmpty(u.AskiyaAlmaNedeni))
+                            {
+                                <div class="small text-muted">@u.AskiyaAlmaNedeni</div>
+                            }
+                        </td>
+                        <td class="text-center">@s.IlanSayisi</td>
+                        <td class="text-center">
+                            @if (s.SikayetSayisi > 0) { <span class="badge bg-warning text-dark">@s.SikayetSayisi</span> } else { <span class="text-muted">0</span> }
+                        </td>
+                        <td class="small text-muted">@u.KayitTarihi.ToLocalTime().ToString("d MMM yyyy", tr)</td>
+                        <td class="text-end pe-3">
+                            @if (u.AskiyaAlindi)
+                            {
+                                <form asp-action="AskiyiKaldir" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="returnUrl" value="@buAdres" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Hesabı aç</button>
+                                </form>
+                            }
+                            else if (!s.Yonetici)
+                            {
+                                <form asp-action="AskiyaAl" method="post" class="d-inline"
+                                      onsubmit="const n = prompt('Askıya alma nedeni (isteğe bağlı):', ''); if (n === null) return false; this.neden.value = n; return true;">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="neden" value="" />
+                                    <input type="hidden" name="returnUrl" value="@buAdres" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Askıya al</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (toplamSayfa > 1)
+{
+    <nav aria-label="Sayfalar">
+        <ul class="pagination justify-content-center mt-3">
+            @for (int i = 1; i <= toplamSayfa; i++)
+            {
+                <li class="page-item @(i == sayfa ? "active" : "")">
+                    <a class="page-link" asp-action="Kullanicilar" asp-route-q="@q" asp-route-durum="@durum" asp-route-sayfa="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

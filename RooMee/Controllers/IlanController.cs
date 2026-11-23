@@ -109,7 +109,9 @@ public class IlanController : Controller
         if (ilan == null) return NotFound();
 
         var benimId = _userManager.GetUserId(User);
-        if (!ilan.Aktif && ilan.KullaniciId != benimId) return NotFound();
+        var yonetici = User.IsInRole(Roller.Yonetici);
+        // Yayında olmayan ya da sahibi askıya alınmış ilanı sadece sahibi ve yöneticiler görebilir
+        if ((!ilan.Aktif || ilan.Kullanici!.AskiyaAlindi) && ilan.KullaniciId != benimId && !yonetici) return NotFound();
 
         ViewBag.Sahibi = ilan.KullaniciId == benimId;
         ViewBag.Favoride = benimId != null &&

@@ -30,7 +30,7 @@ public class HomeController : Controller
         // Uyumlu kişiler: uyum yüzdesine göre; aynı şehirdekilere +15 puan avantaj
         var adaylar = await _db.Users
             .Include(u => u.Profil)
-            .Where(u => u.Id != benimId && u.Profil != null && u.Profil.AramaTuru != null && u.Profil.Sehir != null)
+            .Where(u => u.Id != benimId && !u.AskiyaAlindi && u.Profil != null && u.Profil.AramaTuru != null && u.Profil.Sehir != null)
             .ToListAsync();
         var kartlar = adaylar
             .Select(u => new KullaniciKartViewModel { Kullanici = u, Uyum = RooMee.Services.Uyum.Hesapla(ben, u.Profil)?.Skor })
@@ -41,7 +41,7 @@ public class HomeController : Controller
         ViewBag.OneriKisiler = kartlar;
 
         // Uygun ilanlar: şehrimde ve bütçemin (en fazla) içinde, en yeniler
-        var q = _db.Ilanlar.Where(i => i.Aktif && i.KullaniciId != benimId);
+        var q = _db.Ilanlar.Where(i => i.Aktif && i.KullaniciId != benimId && !i.Kullanici!.AskiyaAlindi);
         if (!string.IsNullOrEmpty(ben.Sehir)) q = q.Where(i => i.Sehir == ben.Sehir);
         if (ben.ButceMax.HasValue) q = q.Where(i => i.Kira <= ben.ButceMax.Value);
         ViewBag.OneriIlanlar = await q
@@ -58,7 +58,7 @@ public class HomeController : Controller
     {
         // Ana sayfada gösterilecek en yeni ilanlar
         var sonIlanlar = await _db.Ilanlar
-            .Where(i => i.Aktif)
+            .Where(i => i.Aktif && !i.Kullanici!.AskiyaAlindi)
             .Include(i => i.Kullanici)
             .Include(i => i.Fotolar)
             .OrderByDescending(i => i.OlusturmaTarihi)

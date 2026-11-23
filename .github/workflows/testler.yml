@@ -1,0 +1,29 @@
+# GitHub'a kod gönderildiğinde ve Pull Request açıldığında testleri çalıştırır.
+# Sonuç, GitHub'da commit'in ve PR'ın yanında ✓ / ✗ olarak görünür.
+name: Testler
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: .NET kur (global.json'daki sürüm)
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Paketleri indir
+        run: dotnet restore RooMee.slnx
+
+      - name: Derle
+        run: dotnet build RooMee.slnx --no-restore -c Release
+
+      - name: Testleri çalıştır
+        run: dotnet test RooMee.Tests --no-build -c Release --logger "console;verbosity=normal"

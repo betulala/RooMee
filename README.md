@@ -26,7 +26,24 @@ Test hesaplarının e-postaları `ad@roomee.test` biçimindedir (ör. `mert@room
 ```
 dotnet run --project RooMee -- --yonetici-yap ornek@mail.com
 ```
-Sonra o hesapla çıkış yapıp tekrar giriş yapınca menüde **Şikayetler** görünür. Test verisi yüklendiyse `yonetici@roomee.test` hesabı zaten yöneticidir.
+Sonra o hesapla çıkış yapıp tekrar giriş yapınca menüde **Yönetim** görünür. Yönetici panelinde genel bakış
+(sayılar, son 14 gün, son kayıtlar ve ilanlar), kullanıcı arama ve **askıya alma**, ilan yönetimi ve şikayetler bulunur.
+Askıya alınan hesap giriş yapamaz, ilanları ve profili diğer kullanıcılardan gizlenir; hesap tekrar açılınca hepsi geri gelir. Test verisi yüklendiyse `yonetici@roomee.test` hesabı zaten yöneticidir.
+
+## Testler
+
+`RooMee.Tests` projesinde otomatik testler var: uyum hesaplama, ilan filtreleri, kayıtlı arama kriterleri,
+hesap silme (KVKK) ve değerlendirme hakkı. Testler hafızada geçici bir SQLite veritabanı kullanır; senin
+LocalDB'ne dokunmaz.
+
+- **Visual Studio:** Test → Test Explorer → "Tümünü Çalıştır"
+- **Komut satırı:** `dotnet test RooMee.Tests -c Release`
+  (Uygulama Visual Studio'da açıkken `-c Release` kullan; yoksa `bin\Debug` kilitli olduğu için derleme hata verir.)
+
+GitHub'a her gönderimde ve her Pull Request'te testler **GitHub Actions** ile otomatik çalışır
+(`.github/workflows/testler.yml`). Sonuç commit'in yanında ✓ / ✗ olarak görünür. ✗ görürsen birleştirmeden önce düzelt.
+
+Yeni bir özellik eklerken ona da test yazmaya çalış; örnekler için mevcut test dosyalarına bak.
 
 ## Çalışma düzeni
 

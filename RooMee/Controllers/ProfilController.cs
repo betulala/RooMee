@@ -41,6 +41,8 @@ public class ProfilController : Controller
 
         var kullanici = await _db.Users.Include(u => u.Profil).FirstOrDefaultAsync(u => u.Id == id);
         if (kullanici == null) return NotFound();
+        // Askıya alınmış profili sadece yöneticiler görebilir
+        if (kullanici.AskiyaAlindi && kullanici.Id != benimId && !User.IsInRole(Roller.Yonetici)) return NotFound();
 
         ViewBag.KendiProfili = kullanici.Id == benimId;
 
@@ -285,18 +287,8 @@ public class ProfilController : Controller
 
         await using var islem = await _db.Database.BeginTransactionAsync();
 
-        // Zincirleme silinmeyen kayıtları elle sil
-        await _db.Favoriler.Where(f => f.KullaniciId == k.Id).ExecuteDeleteAsync();
-        await _db.Sikayetler
-            .Where(s => s.SikayetEdenId == k.Id || s.SikayetEdilenKullaniciId == k.Id)
-            .ExecuteDeleteAsync();
-        await _db.Degerlendirmeler
-            .Where(d => d.YazanId == k.Id || d.HakkindaId == k.Id)
-            .ExecuteDeleteAsync();
-        // Konuşmaları sil (mesajlar zincirleme silinir)
-        await _db.Konusmalar
-            .Where(x => x.Kullanici1Id == k.Id || x.Kullanici2Id == k.Id)
-            .ExecuteDeleteAsync();
+        // Zincirleme silinmeyen kayıtları elle sil (favori, şikayet, değerlendirme, konuşma)
+        await RooMee.Services.HesapSilme.VerileriTemizleAsync(_db, k.Id);
 
         // Kullanıcıyı sil (profil, ilanlar ve ilan fotoğrafları kayıtları otomatik silinir)
         var sonuc = await _userManager.DeleteAsync(k);

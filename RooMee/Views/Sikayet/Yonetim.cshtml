@@ -12,11 +12,8 @@
     <div class="alert alert-success">@mesaj</div>
 }
 
-<div class="sayfa-ust">
-    <span class="ust-etiket">Yönetim</span>
-    <h1>Şikayet yönetimi</h1>
-    <p>Kullanıcıların bildirdiği ilan ve profilleri incele.</p>
-</div>
+@{ ViewData["YonetimSekme"] = "sikayetler"; }
+<partial name="~/Views/Yonetim/_Sekmeler.cshtml" />
 
 <ul class="nav nav-tabs mb-3">
     @foreach (var d in Enum.GetValues<SikayetDurumu>())
